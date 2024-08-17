@@ -13,6 +13,7 @@
     "@logseq/libs": "^0.0.14",
     "flowbite": "^2.5.1",
     "flowbite-react": "^0.10.1",
+    "markdown-to-jsx": "^7.4.7",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-query": "^3.39.3",

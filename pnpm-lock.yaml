@@ -20,6 +20,9 @@ importers:
       flowbite-react:
         specifier: ^0.10.1
         version: 0.10.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@3.4.3)
+      markdown-to-jsx:
+        specifier: ^7.4.7
+        version: 7.4.7(react@18.3.1)
       react:
         specifier: ^18.2.0
         version: 18.3.1
@@ -1938,6 +1941,12 @@ packages:
   map-obj@4.3.0:
     resolution: {integrity: sha512-hdN1wVrZbb29eBGiGjJbeP8JbKjq1urkHJ/LIP/NY48MZ1QVXUsQBV1G1zvYFHn1XE06cwjBsOI2K3Ulnj1YXQ==}
     engines: {node: '>=8'}
+
+  markdown-to-jsx@7.4.7:
+    resolution: {integrity: sha512-0+ls1IQZdU6cwM1yu0ZjjiVWYtkbExSyUIFU2ZeDIFuZM1W42Mh4OlJ4nb4apX4H8smxDHRdFaoIVJGwfv5hkg==}
+    engines: {node: '>= 10'}
+    peerDependencies:
+      react: '>= 0.14.0'
 
   marked-terminal@5.1.1:
     resolution: {integrity: sha512-+cKTOx9P4l7HwINYhzbrBSyzgxO2HaHKGZGuB1orZsMIgXYaJyfidT81VXRdpelW/PcHEWxywscePVgI/oUF6g==}
@@ -5265,6 +5274,10 @@ snapshots:
   map-obj@1.0.1: {}
 
   map-obj@4.3.0: {}
+
+  markdown-to-jsx@7.4.7(react@18.3.1):
+    dependencies:
+      react: 18.3.1
 
   marked-terminal@5.1.1(marked@5.1.0):
     dependencies:
