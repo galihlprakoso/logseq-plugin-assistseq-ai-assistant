@@ -2,7 +2,13 @@ import "@logseq/libs";
 
 import React from "react";
 import * as ReactDOM from "react-dom/client";
+import {
+  QueryClient,
+  QueryClientProvider,
+} from 'react-query'
+import settings from './settings'
 import App from "./App";
+import GeminiContextProvider from './modules/gemini/components/GeminiContextProvider'
 import "./index.css";
 
 import { logseq as PL } from "../package.json";
@@ -12,13 +18,18 @@ const css = (t, ...args) => String.raw(t, ...args);
 
 const pluginId = PL.id;
 
+const queryClient = new QueryClient()
+
 function main() {
-  console.info(`#${pluginId}: MAIN`);
   const root = ReactDOM.createRoot(document.getElementById("app")!);
 
   root.render(
     <React.StrictMode>
-      <App />
+      <QueryClientProvider client={queryClient}>
+        <GeminiContextProvider>
+          <App />
+        </GeminiContextProvider>
+      </QueryClientProvider>
     </React.StrictMode>
   );
 
@@ -52,9 +63,11 @@ function main() {
   logseq.App.registerUIItem("toolbar", {
     key: openIconName,
     template: `
-      <div data-on-click="show" class="${openIconName}">⚙️</div>
+      <a id="${pluginId}" data-on-click="show" data-rect class="button">
+          <i class="ti ti-world" style="font-size: 20px"></i>
+      </a>
     `,
   });
 }
 
-logseq.ready(main).catch(console.error);
+logseq.useSettingsSchema(settings).ready(main).catch(console.error);
