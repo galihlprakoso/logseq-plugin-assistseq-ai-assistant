@@ -3,9 +3,9 @@
 This plugin will analyze the currently open document and all related documents, utilizing them as context for your conversation with the your favourite GPT Model.
 
 ## Todo
-[] Add Terms & Conditions Page
-[] Add OpenAI Provider
-[] Add Ollama Provider (Local)
+- [ ] Add Terms & Conditions Page
+- [ ] Add OpenAI Provider
+- [ ] Add Ollama Provider (Local)
 
 ## How to get started
 1. Clone the repository or use the button "Use this template" on GitHub to create your own version of the repository 🔨
