@@ -1,5 +1,5 @@
 import { useEffect } from "react"
-import useSettingsStore from "../../shared/stores/useSettingsStore"
+import useSettingsStore from "../stores/useSettingsStore"
 
 const useListenSettings = () => {
   const {setSettings} = useSettingsStore()

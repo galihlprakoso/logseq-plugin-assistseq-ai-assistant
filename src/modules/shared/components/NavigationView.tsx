@@ -3,7 +3,7 @@ import useNavigationStore from "../stores/useNavigationStore"
 import { NavigationRoute } from "../types/navigation"
 import MainScreen from "../../../screens/MainScreen"
 import OnboardingScreen from "../../../screens/OnboardingScreen"
-import useSettingsStore from "../stores/useSettingsStore"
+import useSettingsStore from "../../logseq/stores/useSettingsStore"
 
 
 // eslint-disable-next-line react/display-name, react/prop-types

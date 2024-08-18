@@ -1,6 +1,6 @@
 import React, { ReactNode, useMemo } from "react"
 import { GoogleGenerativeAI } from "@google/generative-ai"
-import useSettingsStore from '../../shared/stores/useSettingsStore'
+import useSettingsStore from '../../logseq/stores/useSettingsStore'
 
 type GeminiContext = {
   gemini?: GoogleGenerativeAI

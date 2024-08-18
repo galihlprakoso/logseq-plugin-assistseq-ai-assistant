@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { devtools, persist, createJSONStorage } from 'zustand/middleware'
 import { LogSeqSettings } from '../types/settings'
-import { GeminiAIModelEnum } from '../../logseq/types/settings'
+import { GeminiAIModelEnum } from '../types/settings'
 
 interface SettingState {
   settings: LogSeqSettings

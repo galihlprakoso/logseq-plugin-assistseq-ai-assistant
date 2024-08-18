@@ -3,7 +3,8 @@ export type GeminiEmbeddingDocument = {
   text: string
 }
 
-export type GeminiEmbedding = {  
+export type GeminiEmbedding = {
+  title: string
   text: string
   embeddings: number[]
 }

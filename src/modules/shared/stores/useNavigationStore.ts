@@ -2,12 +2,12 @@ import { create } from 'zustand'
 import { devtools, persist, createJSONStorage } from 'zustand/middleware'
 import { NavigationRoute } from '../types/navigation'
 
-interface SettingState {
+interface NavigationState {
   currentRoute: NavigationRoute
   setRoute: (route: NavigationRoute) => void
 }
 
-const useNavigationStore = create<SettingState>()(
+const useNavigationStore = create<NavigationState>()(
   devtools(
     persist(
       (set) => ({

@@ -27,6 +27,7 @@ const useGetEmbeddings = (documents: GeminiEmbeddingDocument[]) => {
 
         for (let i = 0; i < documents.length; i++) {
           embeddings.push({
+            title: document.title,
             text: documents[i].text,
             embeddings: embeddingResponse.embeddings[i].values,
           })
