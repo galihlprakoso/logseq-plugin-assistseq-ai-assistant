@@ -1,11 +1,11 @@
-# Logseq Plugin Template React 🚀
+# BrainSeq - AI Assistant
 
-## Features
+This plugin will analyze the currently open document and all related documents, utilizing them as context for your conversation with the your favourite GPT Model.
 
-- Plug-and-play boilerplate with properly defined GitHub action defaults
-- Develop with HMR, empowered by lightning-fast Vite ⚡ with [vite-logseq-plugin](https://github.com/pengx17/vite-plugin-logseq)
-- TailwindCSS for styling
-- Pnpm
+## Todo
+[] Add Terms & Conditions Page
+[] Add OpenAI Provider
+[] Add Ollama Provider (Local)
 
 ## How to get started
 1. Clone the repository or use the button "Use this template" on GitHub to create your own version of the repository 🔨
