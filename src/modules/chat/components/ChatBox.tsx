@@ -1,21 +1,23 @@
 import React, { useCallback, useMemo, useState } from "react"
 import TextArea from '../../shared/components/TextArea'
-import ChatBubble from '../../shared/components/ChatBubble'
+import ChatBubble from './ChatBubble'
 import MarkdownRenderer from '../../shared/components/MarkdownRenderer'
 import useChatStore from '../stores/useChatStore'
 import { ChatRoleEnum } from "../types/chat"
 
 type Props = {
-  pageId: number
+  pageName: string
   isSendEnabled: boolean
   onQuerySend: (query: string) => void
+  onCopyMessage: (message: string) => void
+  onAddToPage: (message: string) => void
 }
 
-const ChatBox: React.FC<Props> = ({pageId, isSendEnabled, onQuerySend}) => {
+const ChatBox: React.FC<Props> = ({pageName, isSendEnabled, onQuerySend, onCopyMessage, onAddToPage}) => {
   const [query, setQuery] = useState<string>('')
   const { messages } = useChatStore()
 
-  const messagesData = useMemo(() => messages[pageId] || [], [messages, pageId])
+  const messagesData = useMemo(() => messages[pageName] || [], [messages, pageName])
 
   const onQuerySendButtonClicked = useCallback(() => {
     onQuerySend(query)
@@ -27,12 +29,36 @@ const ChatBox: React.FC<Props> = ({pageId, isSendEnabled, onQuerySend}) => {
       <div className="h-full overflow-y-scroll">
       {messagesData.length > 0 ? (
         <div className="pb-28 px-4 pt-4 flex flex-col justify-end">
-          {messagesData.map((message) => message.role === ChatRoleEnum.User ? 
+          {messagesData.reverse().map((message) => message.role === ChatRoleEnum.User ? 
             <div key={message.id} className="w-full flex justify-end">
               <ChatBubble className="w-3/5 mb-8">
                 <p className="text-gray-800 dark:text-gray-400">{message.content}</p>
               </ChatBubble>
-            </div> : <MarkdownRenderer key={message.id} markdown={message.content} />
+            </div> : (
+              <div key={message.id} className="w-full flex flex-col">
+                <MarkdownRenderer  markdown={message.content} />
+
+                <hr className="h-px my-2 bg-gray-200 border-0 dark:bg-gray-700"></hr>
+
+                <div className="flex flex-row items-center">
+                  <button onClick={() => onCopyMessage(message.content)} type="button" className="px-2 py-1 text-xs inline-flex items-center font-medium text-center text-gray-800 bg-white-700 rounded-lg hover:bg-white-800 dark:bg-white-600 dark:hover:bg-white-700">
+                    <svg className="w-5 h-5 mr-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <path stroke="currentColor" strokeLinejoin="round" strokeWidth="2" d="M15 4v3a1 1 0 0 1-1 1h-3m2 10v1a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-7.13a1 1 0 0 1 .24-.65L6.7 8.35A1 1 0 0 1 7.46 8H9m-1 4H4m16-7v10a1 1 0 0 1-1 1h-7a1 1 0 0 1-1-1V7.87a1 1 0 0 1 .24-.65l2.46-2.87a1 1 0 0 1 .76-.35H19a1 1 0 0 1 1 1Z"/>
+                    </svg>
+
+                    Copy
+                  </button>
+
+                  <button onClick={() => onAddToPage(message.content)} type="button" className="px-2 py-1 text-xs inline-flex items-center font-medium text-center text-gray-800 bg-white-700 rounded-lg hover:bg-white-800 dark:bg-white-600 dark:hover:bg-white-700">
+                    <svg className="w-5 h-5 mr-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 16">
+                      <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M1 8h11m0 0L8 4m4 4-4 4m4-11h3a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-3"/>
+                    </svg>
+
+                    Add to Page
+                  </button>
+                </div>
+              </div>
+            )
           )}
         </div>
       ) : (
@@ -57,7 +83,7 @@ const ChatBox: React.FC<Props> = ({pageId, isSendEnabled, onQuerySend}) => {
             value={query}
           />
           <div className="absolute bottom-0 top-0 right-0 flex items-end pb-2">
-            <button disabled={!isSendEnabled} onClick={onQuerySendButtonClicked} type="button" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm p-2.5 text-center inline-flex items-center me-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+            <button disabled={!isSendEnabled || !query} onClick={onQuerySendButtonClicked} type="button" className={`text-white bg-gray-700 hover:bg-gray-800 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm p-2.5 text-center inline-flex items-center me-2 dark:bg-gray-600 dark:hover:bg-gray-700 dark:focus:ring-gray-800 opacity-${!isSendEnabled || !query ? '50' : '100'}`}>
               <svg className="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
                 <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M1 5h12m0 0L9 1m4 4L9 9"/>
               </svg>

@@ -10,11 +10,15 @@ import { ChatRoleEnum } from '../modules/chat/types/chat'
 import useChatStore from "../modules/chat/stores/useChatStore"
 import { GeminiRoleEnum } from "../modules/gemini/types/content-generation"
 import useControlUI from "../modules/logseq/services/control-ui"
+import useAppendBlockToPage from "../modules/logseq/services/append-block-to-page";
+import useCopyToClipboard from "../modules/shared/services/copy-to-clipboard";
 
 type Props = object
 
 const MainScreen: React.FC<Props> = () => {
   const { showMessage } = useControlUI()
+  const { mutate: appendBlockToPage } = useAppendBlockToPage()
+  const { copyToClipboard } = useCopyToClipboard()
   const { messages, addMessage, addTextToMessage } = useChatStore()
   const { data: documents, isLoading: documentsLoading } = useGetDocuments()
   const { data: embeddings, isLoading: embeddingsLoading } = useGetEmbeddings((documents?.documents || []).map((document) => ({
@@ -24,9 +28,9 @@ const MainScreen: React.FC<Props> = () => {
   const {mutateAsync: generateContent, isLoading: generateContentLoading} = useGenerateContent()
 
   const onQuerySend = useCallback(async (query: string) => {
-    if (embeddings && documents?.pageId) {
+    if (embeddings && documents?.pageName) {
       try {
-        addMessage(documents.pageId, {
+        addMessage(documents.pageName, {
           id: uuidv4(),
           content: query,
           role: ChatRoleEnum.User,
@@ -39,7 +43,7 @@ const MainScreen: React.FC<Props> = () => {
             text: embedding.text,
             embeddings: embedding.embeddings,
           })),
-          prevContents: (messages[documents.pageId] || []).map((doc) => ({
+          prevContents: (messages[documents.pageName] || []).map((doc) => ({
             role: doc.role as unknown as GeminiRoleEnum,
             message: doc.content,
           })),
@@ -53,13 +57,13 @@ const MainScreen: React.FC<Props> = () => {
             const chunkText = chunk.text();
             
             if (i == 0) {
-              addMessage(documents.pageId, {
+              addMessage(documents.pageName, {
                 id: messageId,
                 content: chunkText,
                 role: ChatRoleEnum.AI,
               })
             } else {
-              addTextToMessage(documents.pageId, messageId, chunkText)
+              addTextToMessage(documents.pageName, messageId, chunkText)
             }
 
             i++
@@ -73,12 +77,22 @@ const MainScreen: React.FC<Props> = () => {
   }, [
     addMessage,
     addTextToMessage,
-    documents?.pageId,
+    documents?.pageName,
     embeddings,
     generateContent,
     messages,
     showMessage
   ])
+
+  const onCopyMessage = useCallback((text: string) => {
+    copyToClipboard(text)
+    showMessage("Copied to cliboard!", "success")
+  }, [copyToClipboard, showMessage])
+
+  const onAddToPage = useCallback((text: string) => {
+    appendBlockToPage({text})
+    showMessage("Added to your current page!", "success")
+  }, [appendBlockToPage, showMessage])
 
   if (documentsLoading || embeddingsLoading) {
     return (
@@ -92,8 +106,10 @@ const MainScreen: React.FC<Props> = () => {
     <Card className="h-full relative">            
       <ChatBox
         isSendEnabled={!documentsLoading && !embeddingsLoading && !generateContentLoading}
-        pageId={documents!.pageId}
+        pageName={documents!.pageName}
         onQuerySend={onQuerySend}
+        onCopyMessage={onCopyMessage}
+        onAddToPage={onAddToPage}
       />
     </Card>
   )

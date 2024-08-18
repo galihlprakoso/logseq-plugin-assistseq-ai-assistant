@@ -28,8 +28,8 @@ const appendDocumentContent = async (block: BlockEntity, documents: LogSeqDocume
   return content
 }
 
-const getDocuments = async (pageId: number, documents: LogSeqDocument[]) => {
-  const page = await window.logseq.Editor.getPage(pageId)
+const getDocuments = async (pageName: string, documents: LogSeqDocument[]) => {
+  const page = await window.logseq.Editor.getPage(pageName)
 
   if (!page) return documents
 
@@ -51,15 +51,15 @@ const getDocuments = async (pageId: number, documents: LogSeqDocument[]) => {
 
 const useGetDocuments = () => {
   return useQuery({
-    queryFn: async (): Promise<{pageId: number, documents: LogSeqDocument[]}> => {
+    queryFn: async (): Promise<{pageName: string, documents: LogSeqDocument[]}> => {
       const currentPage = await window.logseq.Editor.getCurrentPage()
 
-      if (!currentPage) return {pageId: 0, documents: []}
+      if (!currentPage) return {pageName: '', documents: []}
 
-      const documents = await getDocuments(currentPage.id, [])
+      const documents = await getDocuments(currentPage.name, [])
 
       return {
-        pageId: currentPage.id,
+        pageName: currentPage.name,
         documents,
       }
     },

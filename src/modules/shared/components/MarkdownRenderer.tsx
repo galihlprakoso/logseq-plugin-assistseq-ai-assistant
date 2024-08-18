@@ -28,11 +28,23 @@ const UL: React.FC<{children: ReactNode}> =
       {children}
     </ul>
   )
+const OL: React.FC<{children: ReactNode}> =
+  ({children, ...props}) => (
+    <ol {...props}>
+      {children}
+    </ol>
+  )
 const LI: React.FC<{children: ReactNode}> =
   ({children, ...props}) => (
     <li {...props}>
       {children}
     </li>
+  )
+const A: React.FC<{children: ReactNode}> =
+  ({children, ...props}) => (
+    <a {...props}>
+      {children}
+    </a>
   )
 
 const MarkdownRenderer: React.FC<Props> = ({markdown, className}) => {
@@ -89,12 +101,24 @@ const MarkdownRenderer: React.FC<Props> = ({markdown, className}) => {
                 className: "space-y-2 text-gray-800 list-disc list-inside dark:text-gray-400 mb-3",
               }
             },
+            ol: {
+              component: OL,
+              props: {
+                className: "space-y-2 text-gray-800 list-decimal list-inside dark:text-gray-400",
+              }
+            },
             li: {
               component: LI,
               props: {
                 className: "text-gray-800 dark:text-gray-400 ml-4",
               }
-            }
+            },
+            a: {
+              component: A,
+              props: {
+                className: "font-medium text-primary-800 underline dark:text-primary-500 hover:no-underline",
+              }
+            },
           },
         }}
       >
