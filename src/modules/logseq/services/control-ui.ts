@@ -9,9 +9,14 @@ const useControlUI = () => {
     window.logseq.showSettingsUI()
   }, [])
 
+  const showMessage = useCallback((message: string, status: "success" | "warning" | "error") => {
+    window.logseq.UI.showMsg(message, status)
+  }, [])
+
   return {
     hideMainUI,
     showSettingsUI,
+    showMessage,
   }
 }
 
