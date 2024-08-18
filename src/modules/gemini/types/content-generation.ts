@@ -1,6 +1,6 @@
 export enum GeminiRoleEnum {
-  User = 'User',
-  AI = 'AI'
+  User = 'user',
+  AI = 'model'
 }
 
 export type GeminiContent = {

@@ -3,6 +3,7 @@ import Markdown from 'markdown-to-jsx'
 
 type Props = {
   markdown: string
+  className?: string
 }
 
 const H1: React.FC<{children: ReactNode}> =
@@ -21,10 +22,23 @@ const BQ: React.FC<{children: ReactNode}> =
       <p>{children}</p>
     </blockquote>
   )
+const UL: React.FC<{children: ReactNode}> =
+  ({children, ...props}) => (
+    <ul {...props}>
+      {children}
+    </ul>
+  )
+const LI: React.FC<{children: ReactNode}> =
+  ({children, ...props}) => (
+    <li {...props}>
+      {children}
+    </li>
+  )
 
-const MarkdownRenderer: React.FC<Props> = ({markdown}) => {
+const MarkdownRenderer: React.FC<Props> = ({markdown, className}) => {
   return (
-    <Markdown
+    <div className={className}>
+      <Markdown      
         options={{
           overrides: {
             h1: {
@@ -62,12 +76,31 @@ const MarkdownRenderer: React.FC<Props> = ({markdown}) => {
               props: {
                 className: "text-xl italic font-semibold text-gray-900 dark:text-white",
               }
+            },
+            text: {
+              component: P,
+              props: {
+                className: "mb-3 text-gray-800 dark:text-gray-400",
+              }
+            },
+            ul: {
+              component: UL,
+              props: {
+                className: "space-y-2 text-gray-800 list-disc list-inside dark:text-gray-400 mb-3",
+              }
+            },
+            li: {
+              component: LI,
+              props: {
+                className: "text-gray-800 dark:text-gray-400 ml-4",
+              }
             }
           },
         }}
       >
         {markdown}
-    </Markdown>
+      </Markdown>
+    </div>
   )
 }
 

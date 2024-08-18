@@ -19,16 +19,18 @@ const ChatBox: React.FC<Props> = ({pageId, isSendEnabled, onQuerySend}) => {
 
   const onQuerySendButtonClicked = useCallback(() => {
     onQuerySend(query)
+    setQuery('')
   }, [query, onQuerySend])
 
   return (
-    <div className="h-full relative">
+    <div className="h-full">
+      <div className="h-full overflow-y-scroll">
       {messagesData.length > 0 ? (
-        <div className="h-full overflow-y-scroll pb-28 px-4 pt-4 flex flex-col justify-end">
+        <div className="pb-28 px-4 pt-4 flex flex-col justify-end">
           {messagesData.map((message) => message.role === ChatRoleEnum.User ? 
             <div key={message.id} className="w-full flex justify-end">
-              <ChatBubble className="w-3/5">
-                <p className="text-gray-500 dark:text-gray-400">{message.content}</p>
+              <ChatBubble className="w-3/5 mb-8">
+                <p className="text-gray-800 dark:text-gray-400">{message.content}</p>
               </ChatBubble>
             </div> : <MarkdownRenderer key={message.id} markdown={message.content} />
           )}
@@ -44,7 +46,8 @@ const ChatBox: React.FC<Props> = ({pageId, isSendEnabled, onQuerySend}) => {
           </p>
         </div> 
       )}
-      <div className="absolute bottom-0 left-0 right-0 flex flex-row p-4">
+      </div>
+      <div className="absolute bottom-0 left-0 right-0 flex flex-row px-4 pb-4 bg-white">
         <div className="flex flex-1 relative">
           <TextArea
             className="flex flex-1"

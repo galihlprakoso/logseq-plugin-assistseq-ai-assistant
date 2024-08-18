@@ -1,6 +1,6 @@
 export enum ChatRoleEnum {
-  User = 'User',
-  AI = 'AI'
+  User = 'user',
+  AI = 'model'
 }
 
 export type ChatMessage = {

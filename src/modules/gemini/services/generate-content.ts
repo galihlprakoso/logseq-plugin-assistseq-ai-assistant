@@ -7,7 +7,7 @@ import { GeminiAIModelEnum } from "../../logseq/types/settings"
 
 const buildPrompt = (query: string, relevantGeminiEmbeddings: GeminiEmbedding[], relatedGeminiEmbeddings: GeminiEmbedding[]) => {  
   return `You are an AI assistant of a LogSeq plugin for LogSeq user.
-Please answer user's query based on relevant documents below (When a document mentions another document's title by using this syntax: [[another document title]], it means that the document have relation with those other mentioned document.):
+Please answer user's query (please format your answer using markdown syntax) based on relevant documents below (When a document mentions another document's title by using this syntax: [[another document title]], it means that the document have relation with those other mentioned document.) Please answer only the query below based on the document, don't mention anything about LogSeq plugin, your output will be directly displayed to the users of this plugin.:
 
 QUERY: ${query}
 RELEVANT DOCUMENTS: 
