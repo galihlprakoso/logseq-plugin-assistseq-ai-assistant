@@ -6,10 +6,7 @@ const useListenSettings = () => {
 
   useEffect(() => {
     const unlisten = window.logseq.onSettingsChanged((newSettings) => {
-      setSettings({
-        geminiApiKey: newSettings.geminiApiKey,
-        geminiModel: newSettings.geminiModel,
-      })
+      setSettings(newSettings)
     })
 
     return () => unlisten()
