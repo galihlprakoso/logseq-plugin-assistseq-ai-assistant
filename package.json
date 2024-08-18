@@ -1,6 +1,6 @@
 {
-  "name": "logseq-plugin-gemini-ai-assistant",
-  "version": "0.0.0",
+  "name": "logseq-plugin-brainseq-ai-assistant",
+  "version": "0.0.1",
   "main": "dist/index.html",
   "scripts": {
     "dev": "vite",
@@ -45,7 +45,7 @@
     "vite-plugin-logseq": "1.1.2"
   },
   "logseq": {
-    "id": "logseq-plugin-gemini-ai-assistant",
+    "id": "logseq-plugin-brainseq-ai-assistant",
     "icon": "./logo.png"
   }
 }

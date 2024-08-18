@@ -2,8 +2,8 @@ import { useQuery } from 'react-query'
 import { TaskType } from "@google/generative-ai"
 import useGeminiClient from '../hooks/useGeminiClient'
 import { GeminiEmbeddingDocument, GeminiEmbedding } from '../types/embeddings'
-import { GeminiAIModelEnum } from '../../logseq/types/settings'
 import { useMemo } from 'react'
+import { GeminiAIModelEnum } from '../types/models'
 
 const useGetEmbeddings = (documents: GeminiEmbeddingDocument[]) => {
   const { gemini } = useGeminiClient()
@@ -39,7 +39,7 @@ const useGetEmbeddings = (documents: GeminiEmbeddingDocument[]) => {
 
       return embeddings
     },
-    queryKey: ['gemini-get-embeddings'],
+    queryKey: ['gemini-get-embeddings', queryKeyDocuments],
     enabled: !!gemini,
     refetchOnWindowFocus: false,
   })

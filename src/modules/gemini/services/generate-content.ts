@@ -3,7 +3,7 @@ import useGeminiClient from '../hooks/useGeminiClient'
 import useSettingsStore from '../../logseq/stores/useSettingsStore'
 import { GeminiEmbedding } from '../types/embeddings'
 import { GeminiContent, GeminiRoleEnum } from '../types/content-generation'
-import { GeminiAIModelEnum } from "../../logseq/types/settings"
+import { GeminiAIModelEnum } from "../types/models"
 
 const buildPrompt = (query: string, relevantGeminiEmbeddings: GeminiEmbedding[], relatedGeminiEmbeddings: GeminiEmbedding[]) => {  
   return `You are an AI assistant of a LogSeq plugin for LogSeq user.
