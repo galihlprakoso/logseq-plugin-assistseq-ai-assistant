@@ -4,10 +4,10 @@ import { AIProvider } from './modules/logseq/types/settings';
 
 const settings: SettingSchemaDesc[] = [
   {
-    key: 'aiProvider',
+    key: 'provider',
     type: 'enum',
-    title: 'AI Provider',
-    description: 'Choose Your GPT AI Provider. (Currently, this plugin only support Gemini).',
+    title: 'GPT Provider',
+    description: 'Choose your preferred provider. (Currently, this plugin only support Gemini).',
     default: AIProvider.Gemini,
     enumChoices: [
       AIProvider.Gemini,
