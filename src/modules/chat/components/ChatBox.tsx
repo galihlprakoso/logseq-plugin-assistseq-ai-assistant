@@ -4,21 +4,20 @@ import ChatBubble from './ChatBubble'
 import MarkdownRenderer from '../../shared/components/MarkdownRenderer'
 import useChatStore from '../stores/useChatStore'
 import { ChatRoleEnum } from "../types/chat"
-import useCurrentPageStore from "../../logseq/stores/useCurrentPageStore"
 
 type Props = {
+  currentPageName: string
   isSendEnabled: boolean
   onQuerySend: (query: string) => void
   onCopyMessage: (message: string) => void
   onAddToPage: (message: string) => void
 }
 
-const ChatBox: React.FC<Props> = ({isSendEnabled, onQuerySend, onCopyMessage, onAddToPage}) => {
-  const { currentPage } = useCurrentPageStore()
+const ChatBox: React.FC<Props> = ({currentPageName, isSendEnabled, onQuerySend, onCopyMessage, onAddToPage}) => {
   const [query, setQuery] = useState<string>('')
   const { messages } = useChatStore()
 
-  const messagesData = useMemo(() => messages[currentPage] || [], [messages, currentPage])
+  const messagesData = useMemo(() => messages[currentPageName] || [], [messages, currentPageName])
 
   const onQuerySendButtonClicked = useCallback(() => {
     onQuerySend(query)

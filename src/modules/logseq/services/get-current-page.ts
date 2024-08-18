@@ -1,18 +1,12 @@
-import { useEffect } from "react"
-import useCurrentPageStore from "../stores/useCurrentPageStore"
+import { useQuery } from "react-query"
 
 const useGetCurrentPage = () => {
-  const {setCurrentPage} = useCurrentPageStore()
-
-  useEffect(() => {
-    window.logseq.Editor.getCurrentPage().then((page) => {
-      setCurrentPage(page?.name || '')
-    })
-
-    return () => {
-      setCurrentPage('')
-    }
-  }, [setCurrentPage])
+  return useQuery({
+    queryFn: () => {
+      return window.logseq.Editor.getCurrentPage()
+    },
+    queryKey: ['get-current-page']
+  })
 }
 
 export default useGetCurrentPage

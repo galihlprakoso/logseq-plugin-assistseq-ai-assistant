@@ -44,7 +44,7 @@ function App() {
                 </div>
               </div>
             </nav>
-          <NavigationView />          
+            <NavigationView />          
         </div>
       </main>
     );
