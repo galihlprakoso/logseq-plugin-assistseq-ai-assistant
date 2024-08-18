@@ -1,7 +1,12 @@
 {
   "name": "logseq-plugin-brainseq-ai-assistant",
-  "version": "0.0.1",
+  "version": "v0.0.1",
   "main": "dist/index.html",
+  "author": "galihlprakoso",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/galihlprakoso/logseq-plugin-brainseq-ai-assistant"
+  },
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
@@ -45,7 +50,8 @@
     "vite-plugin-logseq": "1.1.2"
   },
   "logseq": {
-    "id": "logseq-plugin-brainseq-ai-assistant",
+    "id": "_logseq-plugin-brainseq-ai-assistant",
+    "title": "BrainSeq - AI Assistant",
     "icon": "./logo.png"
   }
 }

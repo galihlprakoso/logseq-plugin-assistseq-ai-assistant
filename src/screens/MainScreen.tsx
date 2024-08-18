@@ -98,7 +98,7 @@ const MainScreen: React.FC<Props> = () => {
   if (documentsLoading || embeddingsLoading || !currentPage) {
     return (
       <Card className="h-full relative flex items-center justify-center">
-        <LoadingIndicator />
+        <LoadingIndicator text="Loading your documents..." />
       </Card>
     )
   }
