@@ -2,17 +2,16 @@ import React, { useCallback } from "react"
 import { v4 as uuidv4 } from 'uuid';
 import Card from '../modules/shared/components/Card'
 import useGetDocuments from '../modules/logseq/services/get-documents'
-import useGetEmbeddings from '../modules/gemini/services/get-embeddings'
-import useGenerateContent from '../modules/gemini/services/generate-content'
 import LoadingIndicator from '../modules/shared/components/LoadingIndicator'
 import ChatBox from '../modules/chat/components/ChatBox'
-import { ChatRoleEnum } from '../modules/chat/types/chat'
 import useChatStore from "../modules/chat/stores/useChatStore"
-import { GeminiRoleEnum } from "../modules/gemini/types/content-generation"
 import useControlUI from "../modules/logseq/services/control-ui"
 import useAppendBlockToPage from "../modules/logseq/services/append-block-to-page";
 import useCopyToClipboard from "../modules/shared/services/copy-to-clipboard";
 import useGetCurrentPage from "../modules/logseq/services/get-current-page";
+import useSettingsStore from "../modules/logseq/stores/useSettingsStore";
+import { ChatMessageRoleEnum } from "../modules/chat/types/chat";
+import useGenerateContent from "../modules/chat/services/generate-content";
 
 type Props = object
 
@@ -22,33 +21,22 @@ const MainScreen: React.FC<Props> = () => {
   const { copyToClipboard } = useCopyToClipboard()
   const { messages, addMessage, addTextToMessage } = useChatStore()
   const { data: currentPage } = useGetCurrentPage()
-  const { data: documents, isLoading: documentsLoading } = useGetDocuments(currentPage?.name)
-  const { data: embeddings, isLoading: embeddingsLoading } = useGetEmbeddings((documents || []).map((document) => ({
-    title: document.title,
-    text: document.content,
-  })))
-  const {mutateAsync: generateContent, isLoading: generateContentLoading} = useGenerateContent()
+  const { settings } = useSettingsStore()
+  const { data: documents, isLoading: documentsLoading } = useGetDocuments(currentPage?.name, settings)
+  const {mutateAsync: generateContent, isLoading: generateContentLoading} = useGenerateContent(documents || [])
 
   const onQuerySend = useCallback(async (query: string) => {
-    if (embeddings && currentPage) {
+    if (currentPage) {
       try {
         addMessage(currentPage.name, {
           id: uuidv4(),
           content: query,
-          role: ChatRoleEnum.User,
+          role: ChatMessageRoleEnum.User,
         })
 
         const response = await generateContent({
           query,
-          geminiEmbeddings: embeddings!.map((embedding) => ({
-            title: embedding.title,
-            text: embedding.text,
-            embeddings: embedding.embeddings,
-          })),
-          prevContents: (messages[currentPage.name] || []).map((doc) => ({
-            role: doc.role as unknown as GeminiRoleEnum,
-            message: doc.content,
-          })),
+          prevContents: messages[currentPage.name] || [],
         })
 
         if (response) {
@@ -62,7 +50,7 @@ const MainScreen: React.FC<Props> = () => {
               addMessage(currentPage.name, {
                 id: messageId,
                 content: chunkText,
-                role: ChatRoleEnum.AI,
+                role: ChatMessageRoleEnum.AI,
               })
             } else {
               addTextToMessage(currentPage.name, messageId, chunkText)
@@ -79,7 +67,6 @@ const MainScreen: React.FC<Props> = () => {
     addMessage,
     addTextToMessage,
     currentPage,
-    embeddings,
     generateContent,
     messages,
     showMessage
@@ -95,7 +82,7 @@ const MainScreen: React.FC<Props> = () => {
     showMessage("Added to your current page!", "success")
   }, [appendBlockToPage, showMessage])
 
-  if (documentsLoading || embeddingsLoading || !currentPage) {
+  if (documentsLoading || !currentPage) {
     return (
       <Card className="h-full relative flex items-center justify-center">
         <LoadingIndicator text="Loading your documents..." />
@@ -106,7 +93,7 @@ const MainScreen: React.FC<Props> = () => {
   return (
     <Card className="h-full relative overflow-hidden">            
       <ChatBox
-        isSendEnabled={!documentsLoading && !embeddingsLoading && !generateContentLoading}
+        isSendEnabled={!documentsLoading && !generateContentLoading}
         onQuerySend={onQuerySend}
         onCopyMessage={onCopyMessage}
         onAddToPage={onAddToPage}

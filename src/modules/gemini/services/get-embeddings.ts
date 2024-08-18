@@ -1,18 +1,19 @@
-import { useQuery } from 'react-query'
+import { useMutation } from 'react-query'
 import { TaskType } from "@google/generative-ai"
 import useGeminiClient from '../hooks/useGeminiClient'
-import { GeminiEmbeddingDocument, GeminiEmbedding } from '../types/embeddings'
 import { useMemo } from 'react'
 import { GeminiAIModelEnum } from '../types/models'
+import { Embedding } from '../../chat/types/gpt'
+import { LogSeqDocument } from '../../logseq/types/logseq'
 
-const useGetEmbeddings = (documents: GeminiEmbeddingDocument[]) => {
+const useGetEmbeddings = (documents: LogSeqDocument[]) => {
   const { gemini } = useGeminiClient()
 
   const queryKeyDocuments = useMemo(() => documents.map((document) => document.title), [documents])
 
-  return useQuery({
-    queryFn: async (): Promise<GeminiEmbedding[]> => {      
-      const embeddings: GeminiEmbedding[] = []
+  return useMutation({
+    mutationFn: async (): Promise<Embedding[]> => {      
+      const embeddings: Embedding[] = []
 
       if (gemini && documents.length > 0) {
         const embeddingModel = gemini.getGenerativeModel({ model: GeminiAIModelEnum.TextEmbedding004 });
@@ -22,7 +23,7 @@ const useGetEmbeddings = (documents: GeminiEmbeddingDocument[]) => {
             title: document.title,
             content: {
               role: 'document',
-              parts: [{ text: document.text }]
+              parts: [{ text: document.content }]
             },
             taskType: TaskType.RETRIEVAL_DOCUMENT,
           }))
@@ -31,7 +32,7 @@ const useGetEmbeddings = (documents: GeminiEmbeddingDocument[]) => {
         for (let i = 0; i < documents.length; i++) {
           embeddings.push({
             title: document.title,
-            text: documents[i].text,
+            text: documents[i].content,
             embeddings: embeddingResponse.embeddings[i].values,
           })
         }
@@ -39,9 +40,7 @@ const useGetEmbeddings = (documents: GeminiEmbeddingDocument[]) => {
 
       return embeddings
     },
-    queryKey: ['gemini-get-embeddings', queryKeyDocuments],
-    enabled: !!gemini,
-    refetchOnWindowFocus: false,
+    mutationKey: ['gemini-get-embeddings', queryKeyDocuments],
   })
 }
 

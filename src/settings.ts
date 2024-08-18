@@ -14,6 +14,13 @@ const settings: SettingSchemaDesc[] = [
     ]
   },
   {
+    key: 'geminiSettings',
+    type: 'heading',
+    title: 'Gemini Settings',
+    description: 'Settings for Gemini provider.',
+    default: '',
+  },
+  {
     key: 'geminiApiKey',
     type: 'string',
     title: 'Gemini API Key',
@@ -33,11 +40,19 @@ const settings: SettingSchemaDesc[] = [
     ]
   },
   {
+    key: 'privacyControl',
+    type: 'heading',
+    title: 'Privacy Control',
+    description: 'These settings will help you to protect your confidential documents.',
+    default: '',
+  },
+  {
     key: 'blacklistedPages',
     type: 'string',
     title: 'Blacklisted Pages',
     description: 'Put page name titles separated in commas. These pages will not be included as a context on any AI Conversations.',
     default: 'a,b,c,todo,card,done,later,doing',
+    inputAs: 'textarea',
   },
   {
     key: 'blacklistedKeywords',
@@ -45,6 +60,14 @@ const settings: SettingSchemaDesc[] = [
     title: 'Blacklisted Keywords',
     description: 'Put some keywords, blocks or pages containing these words will not be included as a context on any AI Conversations..',
     default: 'pass,api key,confidential,password',
+    inputAs: 'textarea',
+  },
+  {
+    key: 'includeDatePage',
+    type: 'boolean',
+    title: 'Include Date Page?',
+    description: 'Do you want to include date page as context to any AI Conversation?',
+    default: false,
   },
   {
     key: 'maxRecursionDepth',

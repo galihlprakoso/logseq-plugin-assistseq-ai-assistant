@@ -1,79 +1,86 @@
-import { BlockEntity } from '@logseq/libs/dist/LSPlugin'
-import { useQuery } from 'react-query'
-import { LogSeqDocument } from '../types/logseq'
+import { BlockEntity } from '@logseq/libs/dist/LSPlugin';
+import { useQuery } from 'react-query';
+import { LogSeqDocument } from '../types/logseq';
+import { LogSeqSettings } from '../types/settings';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function isBlockEntity(obj: any): obj is BlockEntity {
-  return obj && typeof obj === 'object' && 'content' in obj;
+function isBlockEntity(obj: unknown): obj is BlockEntity {
+  return !!obj && typeof obj === 'object' && 'content' in obj;
 }
 
-const BLACKLISTED_PAGES = ["a", "b", "c", "todo", "card", "done", "later", "doing"]
-const MAX_RECURSION_DEPTH = 5
+async function appendBlockContent(
+  block: BlockEntity,
+  depth: number
+): Promise<string> {
+  const indentation = `${'\t'.repeat(Math.max(0, (block.level || 0) - 1))}`;
+  let content = `${indentation}- ${block.content}\n`;
 
-function isAllowedPage(content: string) {
-  const dateRegex = /^(?!\b[A-Za-z]{3} \d{1,2}(st|nd|rd|th), \d{4}\b).+$/
-  return dateRegex.test(content) && !BLACKLISTED_PAGES.includes(content)
-}
-
-const appendDocumentContent = async (block: BlockEntity, documents: LogSeqDocument[], memo: Record<string, boolean>, depth: number) => {  
-  if (block.refs) {
-    for(const ref of block.refs) {
-      await getDocuments(ref.id, documents, memo, depth + 1)
+  if (block.children) {
+    for (const child of block.children) {
+      if (isBlockEntity(child)) {
+        content += await appendBlockContent(child, depth);
+      }
     }
   }
 
-  let content = `${Array(Math.max((block.level || 0) - 1))
-      .fill(0).map(() => '\t').join('')}- ${block.content}\n`
-      
-  for(const children of (block.children || [])) {
-    if (isBlockEntity(children)) {
-      content += await appendDocumentContent(children, documents, memo, depth)
-    }
-  }
-
-  return content
+  return content;
 }
 
-const getDocuments = async (pageName: string, documents: LogSeqDocument[], memo: Record<string, boolean>, depth: number) => {
-  const page = await window.logseq.Editor.getPage(pageName)
+async function getDocumentsRecursively(
+  pageName: string,
+  documents: LogSeqDocument[],
+  visitedPages: Set<string>,
+  depth: number,
+  settings: LogSeqSettings
+): Promise<LogSeqDocument[]> {
+  const page = await window.logseq.Editor.getPage(pageName);
+  if (!page || depth >= settings.maxRecursionDepth) return documents;
 
-  if (!page || depth >= MAX_RECURSION_DEPTH) return documents
+  const { blacklistedPages, blacklistedKeywords } = settings;
+  const blacklistedPagesSet = new Set(blacklistedPages.split(','));
+  const blacklistedKeywordsSet = new Set(blacklistedKeywords.split(','));
 
-  if (!isAllowedPage(page?.name)) {
-    return documents
+  if (
+    blacklistedPagesSet.has(page.name) ||
+    Array.from(blacklistedKeywordsSet).some(keyword => page.name.includes(keyword))
+  ) {
+    return documents;
   }
 
-  if (memo[page.name]) {
-    return documents
-  } else {
-    memo[page.name] = true
-  }
+  if (visitedPages.has(page.name)) return documents;
+  visitedPages.add(page.name);
 
-  let content = ""
+  let content = '';
+  const blocks = await window.logseq.Editor.getPageBlocksTree(page.name);
 
-  const blocks = await window.logseq.Editor.getPageBlocksTree(page.name)
-  
-  for(const block of blocks) {
-    content += await appendDocumentContent(block, documents, memo, depth)
+  for (const block of blocks) {
+    content += await appendBlockContent(block, depth);
   }
 
   documents.push({
     title: page.name,
     content,
-  })
-  
-  return documents
+  });
+
+  for (const block of blocks) {
+    if (block.refs) {
+      for (const ref of block.refs) {
+        await getDocumentsRecursively(ref.id, documents, visitedPages, depth + 1, settings);
+      }
+    }
+  }
+
+  return documents;
 }
 
-const useGetDocuments = (currentPage: string) => {
-  return useQuery({
-    queryFn: async (): Promise<LogSeqDocument[]> => {
-      if (!currentPage) return []
-      return getDocuments(currentPage, [], {}, 0)
+function useGetDocuments(currentPage: string, settings: LogSeqSettings) {
+  return useQuery<LogSeqDocument[]>({
+    queryFn: async () => {
+      if (!currentPage) return [];
+      return getDocumentsRecursively(currentPage, [], new Set<string>(), 0, settings);
     },
     queryKey: ['page-contents', currentPage],
     refetchOnWindowFocus: false,
-  })
+  });
 }
 
-export default useGetDocuments
+export default useGetDocuments;

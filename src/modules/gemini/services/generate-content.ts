@@ -1,11 +1,11 @@
 import { useMutation } from "react-query"
 import useGeminiClient from '../hooks/useGeminiClient'
 import useSettingsStore from '../../logseq/stores/useSettingsStore'
-import { GeminiEmbedding } from '../types/embeddings'
-import { GeminiContent, GeminiRoleEnum } from '../types/content-generation'
 import { GeminiAIModelEnum } from "../types/models"
+import { Embedding } from "../../chat/types/gpt"
+import { ChatMessage, ChatMessageRoleEnum } from "../../chat/types/chat"
 
-const buildPrompt = (query: string, relevantGeminiEmbeddings: GeminiEmbedding[], relatedGeminiEmbeddings: GeminiEmbedding[]) => {  
+const buildPrompt = (query: string, relevantGeminiEmbeddings: Embedding[], relatedGeminiEmbeddings: Embedding[]) => {  
   return `You are an AI assistant of a LogSeq plugin for LogSeq user.
 Please answer user's query (please format your answer using markdown syntax) based on relevant documents below (When a document mentions another document's title by using this syntax: [[another document title]], it means that the document have relation with those other mentioned document.) Please answer only the query below based on the document, don't mention anything about LogSeq plugin, your output will be directly displayed to the users of this plugin.:
 
@@ -34,7 +34,7 @@ const useGenerateContent = () => {
   const { settings } = useSettingsStore()
 
   return useMutation({
-    mutationFn: async ({prevContents, query, geminiEmbeddings}: {prevContents: GeminiContent[], query: string, geminiEmbeddings: GeminiEmbedding[]}) => {
+    mutationFn: async ({prevContents, query, geminiEmbeddings}: {prevContents: ChatMessage[], query: string, geminiEmbeddings: Embedding[]}) => {
       if (gemini) {
         const model = gemini.getGenerativeModel({
           model: settings.geminiModel,
@@ -43,7 +43,7 @@ const useGenerateContent = () => {
 
         const queryEmbedding = await embeddingModel.embedContent(query)
 
-        const similarityScores: (GeminiEmbedding & {score: number})[] = geminiEmbeddings.map(doc => ({
+        const similarityScores: (Embedding & {score: number})[] = geminiEmbeddings.map(doc => ({
           title: doc.title,
           embeddings: doc.embeddings,
           text: doc.text,
@@ -67,12 +67,12 @@ const useGenerateContent = () => {
               role: content.role,
               parts: [
                 {
-                  text: content.message,
+                  text: content.content,
                 }
               ]
             })),
             {
-              role: GeminiRoleEnum.User,
+              role: ChatMessageRoleEnum.User,
               parts: [
                 {
                   text: prompt,
