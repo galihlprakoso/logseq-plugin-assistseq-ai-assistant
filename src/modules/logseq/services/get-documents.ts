@@ -49,21 +49,13 @@ const getDocuments = async (pageName: string, documents: LogSeqDocument[]) => {
   return documents
 }
 
-const useGetDocuments = () => {
+const useGetDocuments = (currentPage: string) => {
   return useQuery({
-    queryFn: async (): Promise<{pageName: string, documents: LogSeqDocument[]}> => {
-      const currentPage = await window.logseq.Editor.getCurrentPage()
-
-      if (!currentPage) return {pageName: '', documents: []}
-
-      const documents = await getDocuments(currentPage.name, [])
-
-      return {
-        pageName: currentPage.name,
-        documents,
-      }
+    queryFn: async (): Promise<LogSeqDocument[]> => {
+      if (!currentPage) return []
+      return getDocuments(currentPage, [])
     },
-    queryKey: ['page-contents'],
+    queryKey: ['page-contents', currentPage],
   })
 }
 

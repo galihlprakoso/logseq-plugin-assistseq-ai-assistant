@@ -12,25 +12,29 @@ import { GeminiRoleEnum } from "../modules/gemini/types/content-generation"
 import useControlUI from "../modules/logseq/services/control-ui"
 import useAppendBlockToPage from "../modules/logseq/services/append-block-to-page";
 import useCopyToClipboard from "../modules/shared/services/copy-to-clipboard";
+import useCurrentPageStore from "../modules/logseq/stores/useCurrentPageStore";
 
 type Props = object
 
 const MainScreen: React.FC<Props> = () => {
+  const { currentPage } = useCurrentPageStore()
   const { showMessage } = useControlUI()
   const { mutate: appendBlockToPage } = useAppendBlockToPage()
   const { copyToClipboard } = useCopyToClipboard()
   const { messages, addMessage, addTextToMessage } = useChatStore()
-  const { data: documents, isLoading: documentsLoading } = useGetDocuments()
-  const { data: embeddings, isLoading: embeddingsLoading } = useGetEmbeddings((documents?.documents || []).map((document) => ({
+  const { data: documents, isLoading: documentsLoading } = useGetDocuments(currentPage)
+  const { data: embeddings, isLoading: embeddingsLoading } = useGetEmbeddings((documents || []).map((document) => ({
     title: document.title,
     text: document.content,
   })))
   const {mutateAsync: generateContent, isLoading: generateContentLoading} = useGenerateContent()
 
+  console.log('currentPage', currentPage)
+
   const onQuerySend = useCallback(async (query: string) => {
-    if (embeddings && documents?.pageName) {
+    if (embeddings && currentPage) {
       try {
-        addMessage(documents.pageName, {
+        addMessage(currentPage, {
           id: uuidv4(),
           content: query,
           role: ChatRoleEnum.User,
@@ -43,7 +47,7 @@ const MainScreen: React.FC<Props> = () => {
             text: embedding.text,
             embeddings: embedding.embeddings,
           })),
-          prevContents: (messages[documents.pageName] || []).map((doc) => ({
+          prevContents: (messages[currentPage] || []).map((doc) => ({
             role: doc.role as unknown as GeminiRoleEnum,
             message: doc.content,
           })),
@@ -57,13 +61,13 @@ const MainScreen: React.FC<Props> = () => {
             const chunkText = chunk.text();
             
             if (i == 0) {
-              addMessage(documents.pageName, {
+              addMessage(currentPage, {
                 id: messageId,
                 content: chunkText,
                 role: ChatRoleEnum.AI,
               })
             } else {
-              addTextToMessage(documents.pageName, messageId, chunkText)
+              addTextToMessage(currentPage, messageId, chunkText)
             }
 
             i++
@@ -77,7 +81,7 @@ const MainScreen: React.FC<Props> = () => {
   }, [
     addMessage,
     addTextToMessage,
-    documents?.pageName,
+    currentPage,
     embeddings,
     generateContent,
     messages,
@@ -94,7 +98,7 @@ const MainScreen: React.FC<Props> = () => {
     showMessage("Added to your current page!", "success")
   }, [appendBlockToPage, showMessage])
 
-  if (documentsLoading || embeddingsLoading) {
+  if (documentsLoading || embeddingsLoading || !currentPage) {
     return (
       <Card className="h-full relative flex items-center justify-center">
         <LoadingIndicator />
@@ -103,10 +107,9 @@ const MainScreen: React.FC<Props> = () => {
   }
 
   return (
-    <Card className="h-full relative">            
+    <Card className="h-full relative overflow-hidden">            
       <ChatBox
         isSendEnabled={!documentsLoading && !embeddingsLoading && !generateContentLoading}
-        pageName={documents!.pageName}
         onQuerySend={onQuerySend}
         onCopyMessage={onCopyMessage}
         onAddToPage={onAddToPage}

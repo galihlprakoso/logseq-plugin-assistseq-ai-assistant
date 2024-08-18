@@ -1,5 +1,5 @@
 {
-  "name": "logseq-plugin-template-react",
+  "name": "logseq-plugin-gemini-ai-assistant",
   "version": "0.0.0",
   "main": "dist/index.html",
   "scripts": {
@@ -45,7 +45,7 @@
     "vite-plugin-logseq": "1.1.2"
   },
   "logseq": {
-    "id": "_pengx17-logseq-template-react",
-    "icon": "./logo.svg"
+    "id": "logseq-plugin-gemini-ai-assistant",
+    "icon": "./logo.png"
   }
 }
