@@ -32,6 +32,27 @@ const settings: SettingSchemaDesc[] = [
       GeminiAIModelEnum.Gemini1_0Pro,
     ]
   },
+  {
+    key: 'blacklistedPages',
+    type: 'string',
+    title: 'Blacklisted Pages',
+    description: 'Put page name titles separated in commas. These pages will not be included as a context on any AI Conversations.',
+    default: 'a,b,c,todo,card,done,later,doing',
+  },
+  {
+    key: 'blacklistedKeywords',
+    type: 'string',
+    title: 'Blacklisted Keywords',
+    description: 'Put some keywords, blocks or pages containing these words will not be included as a context on any AI Conversations..',
+    default: 'pass,api key,confidential,password',
+  },
+  {
+    key: 'maxRecursionDepth',
+    type: 'number',
+    title: 'Document Relational Depth',
+    description: 'How deep is the documents related to the current document will be included.',
+    default: 5,
+  },
 ];
 
 export default settings;

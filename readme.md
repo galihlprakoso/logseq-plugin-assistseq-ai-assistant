@@ -6,6 +6,9 @@ This plugin will analyze the currently open document and all related documents, 
 - [ ] Add Terms & Conditions Page
 - [ ] Add OpenAI Provider
 - [ ] Add Ollama Provider (Local)
+- [ ] Add Setting to Blacklist with keyword
+- [ ] Add Setting to Blacklist Page names
+- [ ] Add Setting
 
 ## How to get started
 1. Clone the repository or use the button "Use this template" on GitHub to create your own version of the repository 🔨

@@ -1,4 +1,5 @@
 export enum NavigationRoute {
   Main = 'Main',
-  Onboarding = 'Onboarding'
+  Onboarding = 'Onboarding',
+  TermsAndConditions = 'TermsAndConditions',
 }

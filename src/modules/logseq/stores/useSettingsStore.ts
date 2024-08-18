@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { devtools, persist, createJSONStorage } from 'zustand/middleware'
-import { LogSeqSettings } from '../types/settings'
+import { AIProvider, LogSeqSettings } from '../types/settings'
 import { GeminiAIModelEnum } from '../../gemini/types/models'
 
 interface SettingState {
@@ -15,6 +15,10 @@ const useSettingsStore = create<SettingState>()(
         settings: {
           geminiApiKey: '',
           geminiModel: GeminiAIModelEnum.Gemini1_5Flash,
+          provider: AIProvider.Gemini,
+          blacklistedPages: 'a,b,c,todo,card,done,later,doing',
+          blacklistedKeywords: 'pass,api key,confidential,password',
+          maxRecursionDepth: 5,
         },
         setSettings: (settings: LogSeqSettings) => set(() => ({ settings })),
       }),

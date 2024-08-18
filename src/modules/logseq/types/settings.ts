@@ -8,4 +8,8 @@ export enum AIProvider {
 export type LogSeqSettings = {
   geminiApiKey: string
   geminiModel: GeminiAIModelEnum
+  provider: AIProvider
+  blacklistedPages: string
+  blacklistedKeywords: string
+  maxRecursionDepth: number
 }
