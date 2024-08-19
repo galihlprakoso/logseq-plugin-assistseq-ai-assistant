@@ -1,42 +1,42 @@
 import { useMutation } from "react-query"
-import useGeminiClient from '../hooks/useGeminiClient'
 import useSettingsStore from '../../logseq/stores/useSettingsStore'
-import { GeminiAIModelEnum } from "../types/models"
 import { Embedding } from "../../chat/types/gpt"
 import { ChatMessage, ChatMessageRoleEnum } from "../../chat/types/chat"
 import { cosineSimilarity } from "../../shared/utils/math"
+import useOpenAIClient from "../hooks/useOpenAIClient"
+import { OpenAIModelEnum } from "../types/models"
 
-const buildPrompt = (query: string, relevantGeminiEmbeddings: Embedding[], relatedGeminiEmbeddings: Embedding[]) => {  
+const buildPrompt = (query: string, relevantEmbeddings: Embedding[], relatedEmbeddings: Embedding[]) => {  
   return `You are an AI assistant of a LogSeq plugin for LogSeq user.
 Please answer user's query (please format your answer using markdown syntax) based on relevant documents below (When a document mentions another document's title by using this syntax: [[another document title]], it means that the document have relation with those other mentioned document.) Please answer only the query below based on the document, don't mention anything about LogSeq plugin, your output will be directly displayed to the users of this plugin.:
 
 QUERY: ${query}
 RELEVANT DOCUMENTS: 
-${relevantGeminiEmbeddings.map((document, idx) => `Doc ${idx + 1}:\nDoc Title: ${document.title}\nDoc Content:\n${document.text}\n`)}
+${relevantEmbeddings.map((document, idx) => `Doc ${idx + 1}:\nDoc Title: ${document.title}\nDoc Content:\n${document.text}\n`)}
 RELATED DOCUMENTS:
-${relatedGeminiEmbeddings.map((document, idx) => `Doc ${idx + 1}:\nDoc Title: ${document.title}\nDoc Content:\n${document.text}\n`)}
+${relatedEmbeddings.map((document, idx) => `Doc ${idx + 1}:\nDoc Title: ${document.title}\nDoc Content:\n${document.text}\n`)}
 `
 }
 
 const useGenerateContent = () => {
-  const { gemini } = useGeminiClient()
+  const { openAI } = useOpenAIClient()
   const { settings } = useSettingsStore()
 
   return useMutation({
     mutationFn: async ({prevContents, query, embeddings}: {prevContents: ChatMessage[], query: string, embeddings: Embedding[]}) => {
-      if (gemini) {
-        const model = gemini.getGenerativeModel({
-          model: settings.geminiModel,
-        })
-        const embeddingModel = gemini.getGenerativeModel({ model: GeminiAIModelEnum.TextEmbedding004 });
+      if (openAI) {
 
-        const queryEmbedding = await embeddingModel.embedContent(query)
+        const queryEmbedding = await openAI.embeddings.create({
+          model: OpenAIModelEnum.TextEmbeddingAda002,
+          input: query,
+          user: ChatMessageRoleEnum.User,
+        })
 
         const similarityScores: (Embedding & {score: number})[] = embeddings.map(doc => ({
           title: doc.title,
           embeddings: doc.embeddings,
           text: doc.text,
-          score: cosineSimilarity(queryEmbedding.embedding.values, doc.embeddings)
+          score: cosineSimilarity(queryEmbedding.data[0].embedding, doc.embeddings)
         }));
 
         const sortedDocuments = similarityScores.sort((a, b) => b.score - a.score);
@@ -50,25 +50,20 @@ const useGenerateContent = () => {
 
         const prompt = buildPrompt(query, relevantEmbeddings, embeddings.filter((doc) => !relevantEmbeddingsTitleMap[doc.title]))
 
-        return model.generateContentStream({
-          contents: [
+        //@ts-ignore
+        return openAI.chat.completions.create({
+          messages: [
             ...prevContents.map((content) => ({
-              role: content.role,
-              parts: [
-                {
-                  text: content.content,
-                }
-              ]
+              role: (content.role === ChatMessageRoleEnum.AI ? 'assistant' : 'user'),
+              content: content.content,              
             })),
             {
-              role: ChatMessageRoleEnum.User,
-              parts: [
-                {
-                  text: prompt,
-                }
-              ]
+              role: "user",
+              content: prompt,
             }
-          ]
+          ],
+          model: settings.openAiModel,   
+          stream: true,       
         })        
       }
     },

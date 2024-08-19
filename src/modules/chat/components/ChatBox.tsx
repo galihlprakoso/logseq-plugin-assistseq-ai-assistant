@@ -30,6 +30,8 @@ const ChatBox: React.FC<Props> = ({currentPageName, isSendEnabled, onQuerySend, 
   const providerModel = useMemo(() => {
     if (settings.provider === AIProvider.Gemini) {
       return settings.geminiModel
+    } else if (settings.provider === AIProvider.OpenAI) {
+      return settings.openAiModel
     }
     return ''
   }, [settings])
@@ -38,7 +40,7 @@ const ChatBox: React.FC<Props> = ({currentPageName, isSendEnabled, onQuerySend, 
     <div className="h-full relative">
       <div className="h-full overflow-y-scroll">
         {messagesData.length > 0 ? (
-          <div className="pb-28 px-4 pt-24 flex flex-col justify-end">
+          <div className="pb-36 px-4 pt-24 flex flex-col justify-end">
             {messagesData.reverse().map((message) => message.role === ChatMessageRoleEnum.User ? 
               <div key={message.id} className="w-full flex justify-end">
                 <ChatBubble className="w-3/5 mb-8">

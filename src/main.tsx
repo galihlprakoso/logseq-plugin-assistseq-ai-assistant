@@ -12,6 +12,7 @@ import GeminiContextProvider from './modules/gemini/components/GeminiContextProv
 import "./index.css";
 
 import { logseq as PL } from "../package.json";
+import OpenAIContextProvider from "./modules/openai/components/OpenAIContextProvider";
 
 // @ts-expect-error
 const css = (t, ...args) => String.raw(t, ...args);
@@ -27,7 +28,9 @@ function main() {
     <React.StrictMode>
       <QueryClientProvider client={queryClient}>
         <GeminiContextProvider>
-          <App />
+          <OpenAIContextProvider>
+            <App />
+          </OpenAIContextProvider>
         </GeminiContextProvider>
       </QueryClientProvider>
     </React.StrictMode>

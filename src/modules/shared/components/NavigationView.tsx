@@ -16,7 +16,8 @@ const NavigationView: React.FC = () => {
   const { isAcceptedTermsAndConditions } = useFlagsStore()
 
   useEffect(() => {
-    if (settings.provider === AIProvider.Gemini && settings.geminiApiKey) {
+    if ((settings.provider === AIProvider.Gemini && settings.geminiApiKey) || 
+        (settings.provider === AIProvider.OpenAI && settings.openAiApiKey)) {
       setRoute(NavigationRoute.Main)
     } else if(!isAcceptedTermsAndConditions) {
       setRoute(NavigationRoute.TermsAndConditions)

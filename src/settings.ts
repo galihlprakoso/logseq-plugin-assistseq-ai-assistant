@@ -1,6 +1,7 @@
 import { SettingSchemaDesc } from '@logseq/libs/dist/LSPlugin';
 import { GeminiAIModelEnum } from './modules/gemini/types/models';
 import { AIProvider } from './modules/logseq/types/settings';
+import { OpenAIModelEnum } from './modules/openai/types/models';
 
 const settings: SettingSchemaDesc[] = [
   {
@@ -11,6 +12,7 @@ const settings: SettingSchemaDesc[] = [
     default: AIProvider.Gemini,
     enumChoices: [
       AIProvider.Gemini,
+      AIProvider.OpenAI,
     ]
   },
   {
@@ -24,19 +26,48 @@ const settings: SettingSchemaDesc[] = [
     key: 'geminiApiKey',
     type: 'string',
     title: 'Gemini API Key',
-    description: 'Your Gemini API Key. This key will saved locally.',
+    description: 'Your Gemini API Key (This key will saved locally).',
     default: '',
   },
   {
     key: 'geminiModel',
     type: 'enum',
     title: 'Gemini Model',
-    description: 'Your Gemini API Key. This key will saved locally.',
+    description: 'Select Gemini Model.',
     default: GeminiAIModelEnum.Gemini1_5Flash,
     enumChoices: [
       GeminiAIModelEnum.Gemini1_5Flash,
       GeminiAIModelEnum.Gemini1_5Pro,
       GeminiAIModelEnum.Gemini1_0Pro,
+    ]
+  },
+  {
+    key: 'openAiSettings',
+    type: 'heading',
+    title: 'OpenAI Settings',
+    description: 'Settings for OpenAI provider.',
+    default: '',
+  },
+  {
+    key: 'openAiApiKey',
+    type: 'string',
+    title: 'OpenAI API Key',
+    description: 'Your OpenAI API Key (This key will saved locally).',
+    default: '',
+  },
+  {
+    key: 'openAiModel',
+    type: 'enum',
+    title: 'OpenAI Model',
+    description: 'Select OpenAI Model',
+    default: OpenAIModelEnum.GPT3_5Turbo,
+    enumChoices: [
+      OpenAIModelEnum.GPT4o,
+      OpenAIModelEnum.GPT4oMini,
+      OpenAIModelEnum.GPT4Turbo,
+      OpenAIModelEnum.GPT4,
+      OpenAIModelEnum.GPT3_5Turbo,
+      OpenAIModelEnum.TextEmbeddingAda002,
     ]
   },
   {

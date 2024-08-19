@@ -5,6 +5,7 @@ import { useMemo } from 'react'
 import { GeminiAIModelEnum } from '../types/models'
 import { Embedding } from '../../chat/types/gpt'
 import { LogSeqDocument } from '../../logseq/types/logseq'
+import { ChatMessageRoleEnum } from '../../chat/types/chat'
 
 const useGetEmbeddings = (documents: LogSeqDocument[]) => {
   const { gemini } = useGeminiClient()
@@ -22,7 +23,7 @@ const useGetEmbeddings = (documents: LogSeqDocument[]) => {
           requests: documents.map((document) => ({
             title: document.title,
             content: {
-              role: 'document',
+              role: ChatMessageRoleEnum.AI,
               parts: [{ text: document.content }]
             },
             taskType: TaskType.RETRIEVAL_DOCUMENT,

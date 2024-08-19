@@ -9,7 +9,8 @@ function isBlockEntity(obj: unknown): obj is BlockEntity {
 
 async function appendBlockContent(
   block: BlockEntity,
-  depth: number
+  depth: number,
+  settings: LogSeqSettings
 ): Promise<string> {
   const indentation = `${'\t'.repeat(Math.max(0, (block.level || 0) - 1))}`;
   let content = `${indentation}- ${block.content}\n`;
@@ -17,7 +18,10 @@ async function appendBlockContent(
   if (block.children) {
     for (const child of block.children) {
       if (isBlockEntity(child)) {
-        content += await appendBlockContent(child, depth);
+        const contentToBeAppended = await appendBlockContent(child, depth, settings);
+        if (!settings.blacklistedKeywords.split(",").some((keyword) => contentToBeAppended.includes(keyword))) {
+          content += contentToBeAppended
+        }
       }
     }
   }
@@ -53,7 +57,7 @@ async function getDocumentsRecursively(
   const blocks = await window.logseq.Editor.getPageBlocksTree(page.name);
 
   for (const block of blocks) {
-    content += await appendBlockContent(block, depth);
+    content += await appendBlockContent(block, depth, settings);
   }
 
   documents.push({

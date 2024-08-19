@@ -12,6 +12,10 @@ import useGetCurrentPage from "../modules/logseq/services/get-current-page";
 import useSettingsStore from "../modules/logseq/stores/useSettingsStore";
 import { ChatMessageRoleEnum } from "../modules/chat/types/chat";
 import useGenerateContent from "../modules/chat/services/generate-content";
+import { AIProvider } from "../modules/logseq/types/settings";
+import { GenerateContentStreamResult } from "@google/generative-ai";
+import { ChatCompletion, ChatCompletionChunk } from "openai/resources";
+import { Stream } from "openai/streaming";
 
 type Props = object
 
@@ -43,34 +47,47 @@ const MainScreen: React.FC<Props> = () => {
           const messageId = uuidv4()
           let i = 0 
 
-          for await (const chunk of response.stream) {
-            const chunkText = chunk.text();
+          if (settings.provider === AIProvider.Gemini) {
             
-            if (i == 0) {
-              addMessage(currentPage.name, {
-                id: messageId,
-                content: chunkText,
-                role: ChatMessageRoleEnum.AI,
-              })
-            } else {
-              addTextToMessage(currentPage.name, messageId, chunkText)
-            }
 
-            i++
+            for await (const chunk of (response as GenerateContentStreamResult).stream) {
+              const chunkText = chunk.text();
+              
+              if (i == 0) {
+                addMessage(currentPage.name, {
+                  id: messageId,
+                  content: chunkText,
+                  role: ChatMessageRoleEnum.AI,
+                })
+              } else {
+                addTextToMessage(currentPage.name, messageId, chunkText)
+              }
+
+              i++
+            }
+          } else {
+            for await (const chunk of (response as (ChatCompletion & Stream<ChatCompletionChunk>))) {
+              const chunkText = chunk.choices[0]?.delta?.content || ''
+              
+              if (i == 0) {
+                addMessage(currentPage.name, {
+                  id: messageId,
+                  content: chunkText,
+                  role: ChatMessageRoleEnum.AI,
+                })
+              } else {
+                addTextToMessage(currentPage.name, messageId, chunkText)
+              }
+
+              i++
+            }
           }
         }
       } catch (err) {
-        showMessage("There is an error when trying to communicate with Gemini AI.", "error")
+        showMessage("There is an error when trying to communicate with AI Provider.", "error")
       }
     }    
-  }, [
-    addMessage,
-    addTextToMessage,
-    currentPage,
-    generateContent,
-    messages,
-    showMessage
-  ])
+  }, [addMessage, addTextToMessage, currentPage, generateContent, messages, settings.provider, showMessage])
 
   const onCopyMessage = useCallback((text: string) => {
     copyToClipboard(text)
