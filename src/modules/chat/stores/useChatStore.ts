@@ -6,6 +6,7 @@ interface ChatState {
   messages: Record<string, ChatMessage[]>
   addMessage: (pageName: string, message: ChatMessage) => void
   addTextToMessage: (pageName: string, messageId: string, text: string) => void
+  clearChat: (pageName: string) => void
 }
 
 const useChatStore = create<ChatState>()(
@@ -34,6 +35,12 @@ const useChatStore = create<ChatState>()(
               }
               return message
             }))
+          }
+        })),
+        clearChat: (pageName: string) => set((state) => ({
+          messages: {
+            ...state.messages,
+            [pageName]: [],
           }
         }))
       }),

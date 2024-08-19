@@ -15,10 +15,12 @@ type Props = {
   onAddToPage: (message: string) => void
 }
 
+const KEYDOWN_ENTER = "Enter"
+
 const ChatBox: React.FC<Props> = ({currentPageName, isSendEnabled, onQuerySend, onCopyMessage, onAddToPage}) => {
   const {settings} = useSettingsStore()
   const [query, setQuery] = useState<string>('')
-  const { messages } = useChatStore()
+  const { messages, clearChat } = useChatStore()
 
   const messagesData = useMemo(() => messages[currentPageName] || [], [messages, currentPageName])
 
@@ -93,10 +95,26 @@ const ChatBox: React.FC<Props> = ({currentPageName, isSendEnabled, onQuerySend, 
             rows={3}
             //@ts-ignore
             onChange={(e) => setQuery(e.target.value)}
+            onKeyDown={(e) => {
+              if(e.key === KEYDOWN_ENTER) {
+                onQuerySendButtonClicked()
+              }
+            }}
             value={query}
           />
-          <div className="flex flex-row items-center mt-1">
+          <div className="flex flex-row items-centers justify-between mt-1">
             <span className="text-xs text-gray-500">{settings.provider} - {providerModel} &#x2022; {currentPageName}</span>
+
+            <span
+              className="text-xs text-gray-500 underline cursor-pointer"
+              onClick={() => {
+                if (confirm(`Are you sure to clear all chats on this page (${currentPageName})?`)) {
+                  clearChat(currentPageName)
+                }
+              }}
+            >
+              Clear Chat
+            </span>
           </div>
           <div className="absolute bottom-5 top-0 right-0 flex items-end pb-2">
             <button disabled={!isSendEnabled || !query} onClick={onQuerySendButtonClicked} type="button" className={`text-white bg-gray-700 hover:bg-gray-800 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm p-2.5 text-center inline-flex items-center me-2 dark:bg-gray-600 dark:hover:bg-gray-700 dark:focus:ring-gray-800 opacity-${!isSendEnabled || !query ? '50' : '100'}`}>
