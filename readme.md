@@ -8,6 +8,11 @@ This plugin will analyze the currently open document and all related documents, 
 - [ ] Add Ollama Provider (Local)
 - [x] Add Setting to Blacklist with keyword
 - [x] Add Setting to Blacklist Page names
+- [ ] Add Context Choice 
+  - Current Page
+  - Select Page
+- [ ] Add Setting to Include Related Documents or not
+- [ ] Replace Embedding with LogSeq query
 
 ## How to get started
 1. Clone the repository or use the button "Use this template" on GitHub to create your own version of the repository 🔨
