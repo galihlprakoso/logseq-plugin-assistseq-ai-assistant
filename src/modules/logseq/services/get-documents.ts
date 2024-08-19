@@ -7,18 +7,28 @@ function isBlockEntity(obj: unknown): obj is BlockEntity {
   return !!obj && typeof obj === 'object' && 'content' in obj;
 }
 
+const DATE_PAGE_REGEX = /^(?!\b[A-Za-z]{3} \d{1,2}(st|nd|rd|th), \d{4}\b).+$/;
+
 async function appendBlockContent(
   block: BlockEntity,
   depth: number,
-  settings: LogSeqSettings
+  settings: LogSeqSettings,
+  documents: LogSeqDocument[],
+  visitedPages: Set<string>
 ): Promise<string> {
+  if (block.refs) {
+    for(const ref of block.refs) {
+      await getDocumentsRecursively(ref.id, documents, visitedPages, depth + 1, settings)
+    }
+  }
+
   const indentation = `${'\t'.repeat(Math.max(0, (block.level || 0) - 1))}`;
   let content = `${indentation}- ${block.content}\n`;
 
   if (block.children) {
     for (const child of block.children) {
       if (isBlockEntity(child)) {
-        const contentToBeAppended = await appendBlockContent(child, depth, settings);
+        const contentToBeAppended = await appendBlockContent(child, depth, settings, documents, visitedPages);
         if (!settings.blacklistedKeywords.split(",").some((keyword) => contentToBeAppended.includes(keyword))) {
           content += contentToBeAppended
         }
@@ -45,7 +55,8 @@ async function getDocumentsRecursively(
 
   if (
     blacklistedPagesSet.has(page.name) ||
-    Array.from(blacklistedKeywordsSet).some(keyword => page.name.includes(keyword))
+    Array.from(blacklistedKeywordsSet).some(keyword => page.name.includes(keyword)) ||
+    (!settings.includeDatePage && !DATE_PAGE_REGEX.test(page.name))
   ) {
     return documents;
   }
@@ -57,7 +68,7 @@ async function getDocumentsRecursively(
   const blocks = await window.logseq.Editor.getPageBlocksTree(page.name);
 
   for (const block of blocks) {
-    content += await appendBlockContent(block, depth, settings);
+    content += await appendBlockContent(block, depth, settings, documents, visitedPages);
   }
 
   documents.push({
@@ -67,7 +78,7 @@ async function getDocumentsRecursively(
 
   for (const block of blocks) {
     if (block.refs) {
-      for (const ref of block.refs) {
+      for (const ref of block.refs) {        
         await getDocumentsRecursively(ref.id, documents, visitedPages, depth + 1, settings);
       }
     }

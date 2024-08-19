@@ -27,6 +27,7 @@ const MainScreen: React.FC<Props> = () => {
   const { data: currentPage } = useGetCurrentPage()
   const { settings } = useSettingsStore()
   const { data: documents, isLoading: documentsLoading } = useGetDocuments(currentPage?.name, settings)
+
   const {mutateAsync: generateContent, isLoading: generateContentLoading} = useGenerateContent(documents || [])
 
   const onQuerySend = useCallback(async (query: string) => {
@@ -47,9 +48,7 @@ const MainScreen: React.FC<Props> = () => {
           const messageId = uuidv4()
           let i = 0 
 
-          if (settings.provider === AIProvider.Gemini) {
-            
-
+          if (settings.provider === AIProvider.Gemini) {            
             for await (const chunk of (response as GenerateContentStreamResult).stream) {
               const chunkText = chunk.text();
               

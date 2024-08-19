@@ -15,4 +15,5 @@ export type LogSeqSettings = {
   blacklistedPages: string
   blacklistedKeywords: string
   maxRecursionDepth: number
+  includeDatePage: boolean
 }

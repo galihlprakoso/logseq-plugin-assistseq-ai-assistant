@@ -22,6 +22,7 @@ const useSettingsStore = create<SettingState>()(
           blacklistedPages: 'a,b,c,todo,card,done,later,doing',
           blacklistedKeywords: 'pass,api key,confidential,password',
           maxRecursionDepth: 5,
+          includeDatePage: false,
         },
         setSettings: (settings: LogSeqSettings) => set(() => ({ settings })),
       }),
