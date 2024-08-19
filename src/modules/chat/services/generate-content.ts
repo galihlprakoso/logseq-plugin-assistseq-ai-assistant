@@ -3,7 +3,6 @@ import { useMutation } from 'react-query'
 import { useMemo, useRef } from 'react'
 import useGeminiGetEmbeddings from '../../gemini/services/get-embeddings'
 import useGeminiGenerateContent from '../../gemini/services/generate-content'
-import useOpenAIGetEmbeddings from '../../openai/services/get-embeddings'
 import useOpenAIGenerateContent from '../../openai/services/generate-content'
 import { ChatMessage } from '../types/chat'
 import { LogSeqDocument } from '../../logseq/types/logseq'
@@ -24,35 +23,25 @@ const useGenerateContent = (documents: LogSeqDocument[]) => {
 
   const {mutateAsync: getGeminiEmbeddings} = useGeminiGetEmbeddings(documents)
   const {mutateAsync: geminiGenerateContent} = useGeminiGenerateContent()
-  const {mutateAsync: getOpenAIEmbeddings} = useOpenAIGetEmbeddings(documents)
   const {mutateAsync: openAIGenerateContent} = useOpenAIGenerateContent()
 
   return useMutation({
     mutationFn: async ({prevContents, query}: MutationArgs) => { 
       
+      // Need to use Gemini embedding for now.
       let embeddings = embeddingsCacheSetRef.current.get(mutationKey)
+      if (!embeddings) {
+        embeddings = await getGeminiEmbeddings()
+        embeddingsCacheSetRef.current.set(mutationKey, embeddings)
+      }
 
       if (settings.provider === AIProvider.Gemini) {
-
-        if (!embeddings) {
-          embeddings = await getGeminiEmbeddings()
-        }
-
-        embeddingsCacheSetRef.current.set(mutationKey, embeddings)
-
         return geminiGenerateContent({
           prevContents,
           query,
           embeddings,
         })
-      } else {
-
-        if (!embeddings) {
-          embeddings = await getOpenAIEmbeddings()
-        }
-
-        embeddingsCacheSetRef.current.set(mutationKey, embeddings)
-
+      } else {   
         return openAIGenerateContent({
           prevContents,
           query,

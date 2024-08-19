@@ -4,7 +4,8 @@ import { Embedding } from "../../chat/types/gpt"
 import { ChatMessage, ChatMessageRoleEnum } from "../../chat/types/chat"
 import { cosineSimilarity } from "../../shared/utils/math"
 import useOpenAIClient from "../hooks/useOpenAIClient"
-import { OpenAIModelEnum } from "../types/models"
+import useGeminiClient from "../../gemini/hooks/useGeminiClient"
+import { GeminiAIModelEnum } from "../../gemini/types/models"
 
 const buildPrompt = (query: string, relevantEmbeddings: Embedding[], relatedEmbeddings: Embedding[]) => {  
   return `You are an AI assistant of a LogSeq plugin for LogSeq user.
@@ -20,23 +21,22 @@ ${relatedEmbeddings.map((document, idx) => `Doc ${idx + 1}:\nDoc Title: ${docume
 
 const useGenerateContent = () => {
   const { openAI } = useOpenAIClient()
+  const { gemini } = useGeminiClient()
   const { settings } = useSettingsStore()
 
   return useMutation({
     mutationFn: async ({prevContents, query, embeddings}: {prevContents: ChatMessage[], query: string, embeddings: Embedding[]}) => {
-      if (openAI) {
+      if (openAI && gemini) {
 
-        const queryEmbedding = await openAI.embeddings.create({
-          model: OpenAIModelEnum.TextEmbeddingAda002,
-          input: query,
-          user: ChatMessageRoleEnum.User,
-        })
+        // Need to use Gemini embedding for now.
+        const embeddingModel = gemini.getGenerativeModel({ model: GeminiAIModelEnum.TextEmbedding004 });
+        const queryEmbedding = await embeddingModel.embedContent(query)
 
         const similarityScores: (Embedding & {score: number})[] = embeddings.map(doc => ({
           title: doc.title,
           embeddings: doc.embeddings,
           text: doc.text,
-          score: cosineSimilarity(queryEmbedding.data[0].embedding, doc.embeddings)
+          score: cosineSimilarity(queryEmbedding.embedding.values, doc.embeddings)
         }));
 
         const sortedDocuments = similarityScores.sort((a, b) => b.score - a.score);
