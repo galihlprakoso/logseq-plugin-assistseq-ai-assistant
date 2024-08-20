@@ -1,6 +1,6 @@
 {
   "name": "logseq-plugin-brainseq-ai-assistant",
-  "version": "v0.0.1",
+  "version": "0.0.1",
   "main": "dist/index.html",
   "author": "galihlprakoso",
   "repository": {
