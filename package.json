@@ -51,8 +51,8 @@
     "vite-plugin-logseq": "1.1.2"
   },
   "logseq": {
-    "id": "logseq-brainseq-ai-assistant",
-    "title": "BrainSeq - AI Assistant",
+    "id": "logseq-plugin-assistseq-ai-assistant",
+    "title": "AssistSeq - AI Assistant",
     "icon": "./logo.png"
   }
 }

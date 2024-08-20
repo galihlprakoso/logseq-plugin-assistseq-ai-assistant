@@ -3,14 +3,14 @@ import Card from "../modules/shared/components/Card"
 import MarkdownRenderer from "../modules/shared/components/MarkdownRenderer"
 import useFlagsStore from "../modules/shared/stores/useFlagsStore"
 
-const TERMS_AND_CONDITIONS = `# Terms and Conditions for BrainSeq - AI Assistant
+const TERMS_AND_CONDITIONS = `# Terms and Conditions for AssistSeq - AI Assistant
 
 Last Updated: 18th August 2024
 
-These Terms and Conditions ("Terms") govern your use of the BrainSeq - AI Assistant plugin ("the Plugin"). By using the Plugin, you agree to be bound by these Terms. If you do not agree to these Terms, do not use the Plugin.
+These Terms and Conditions ("Terms") govern your use of the AssistSeq - AI Assistant plugin ("the Plugin"). By using the Plugin, you agree to be bound by these Terms. If you do not agree to these Terms, do not use the Plugin.
 
 ### 1. **Local Storage of API Keys**
-All API keys provided by the user for the Plugin’s operation are stored locally on your device. The developer of BrainSeq - AI Assistant does not have access to or store these API keys on any external servers or third-party services.
+All API keys provided by the user for the Plugin’s operation are stored locally on your device. The developer of AssistSeq - AI Assistant does not have access to or store these API keys on any external servers or third-party services.
 
 ### 2. **Data Privacy and Security**
 The Plugin accesses your LogSeq documents to provide context-aware assistance. While the developer has implemented certain features to enhance data privacy and security, such as:
@@ -24,7 +24,7 @@ The Plugin accesses your LogSeq documents to provide context-aware assistance. W
 - **Data Backup:** Users should regularly back up their LogSeq documents and any associated data. The developer is not responsible for any data loss or corruption that may occur while using the Plugin.
 
 ### 4. **Limitations of Liability**
-To the fullest extent permitted by law, the developer of BrainSeq - AI Assistant is not liable for any indirect, incidental, special, consequential, or punitive damages arising out of or related to your use of the Plugin. This includes, but is not limited to, damages for loss of data, unauthorized access, or other breaches of privacy.
+To the fullest extent permitted by law, the developer of AssistSeq - AI Assistant is not liable for any indirect, incidental, special, consequential, or punitive damages arising out of or related to your use of the Plugin. This includes, but is not limited to, damages for loss of data, unauthorized access, or other breaches of privacy.
 
 ### 5. **Disclaimer of Warranties**
 The Plugin is provided "as is" without warranties of any kind, either express or implied. The developer makes no representations or warranties regarding the reliability, functionality, or security of the Plugin. Users acknowledge that they use the Plugin at their own risk.
@@ -38,7 +38,7 @@ For any questions, support, or concerns regarding the Plugin, users can contact 
 ### 8. **Governing Law**
 These Terms shall be governed by and construed in accordance with the laws of Indonesia, without regard to its conflict of law principles.
 
-By using BrainSeq - AI Assistant, you acknowledge that you have read, understood, and agreed to these Terms and Conditions.
+By using AssistSeq - AI Assistant, you acknowledge that you have read, understood, and agreed to these Terms and Conditions.
 `
 
 const TermsAndConditionsScreen: React.FC = () => {
