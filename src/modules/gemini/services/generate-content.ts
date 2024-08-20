@@ -2,21 +2,10 @@ import { useMutation } from "react-query"
 import useGeminiClient from '../hooks/useGeminiClient'
 import useSettingsStore from '../../logseq/stores/useSettingsStore'
 import { GeminiAIModelEnum } from "../types/models"
-import { Embedding } from "../../chat/types/gpt"
+import { Embedding } from "../../shared/types/gpt"
 import { ChatMessage, ChatMessageRoleEnum } from "../../chat/types/chat"
 import { cosineSimilarity } from "../../shared/utils/math"
-
-const buildPrompt = (query: string, relevantGeminiEmbeddings: Embedding[], relatedGeminiEmbeddings: Embedding[]) => {  
-  return `You are an AI assistant of a LogSeq plugin for LogSeq user.
-Please answer user's query (please format your answer using markdown syntax) based on relevant documents below (When a document mentions another document's title by using this syntax: [[another document title]], it means that the document have relation with those other mentioned document.) Please answer only the query below based on the document, don't mention anything about LogSeq plugin, your output will be directly displayed to the users of this plugin.:
-
-QUERY: ${query}
-RELEVANT DOCUMENTS: 
-${relevantGeminiEmbeddings.map((document, idx) => `Doc ${idx + 1}:\nDoc Title: ${document.title}\nDoc Content:\n${document.text}\n`)}
-RELATED DOCUMENTS:
-${relatedGeminiEmbeddings.map((document, idx) => `Doc ${idx + 1}:\nDoc Title: ${document.title}\nDoc Content:\n${document.text}\n`)}
-`
-}
+import { buildPrompt } from "../../shared/utils/prompt"
 
 const useGenerateContent = () => {
   const { gemini } = useGeminiClient()
@@ -48,7 +37,12 @@ const useGenerateContent = () => {
           relevantEmbeddingsTitleMap[doc.title] = true
         })
 
-        const prompt = buildPrompt(query, relevantEmbeddings, embeddings.filter((doc) => !relevantEmbeddingsTitleMap[doc.title]))
+        const prompt = buildPrompt(
+          query,
+          relevantEmbeddings,
+          embeddings.filter((doc) => !relevantEmbeddingsTitleMap[doc.title]),
+          settings.includeVisualization,
+        )
 
         return model.generateContentStream({
           contents: [

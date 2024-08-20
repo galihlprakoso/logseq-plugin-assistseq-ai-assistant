@@ -3,7 +3,7 @@ import { TaskType } from "@google/generative-ai"
 import useGeminiClient from '../hooks/useGeminiClient'
 import { useMemo } from 'react'
 import { GeminiAIModelEnum } from '../types/models'
-import { Embedding } from '../../chat/types/gpt'
+import { Embedding } from '../../shared/types/gpt'
 import { LogSeqDocument } from '../../logseq/types/logseq'
 import { ChatMessageRoleEnum } from '../../chat/types/chat'
 

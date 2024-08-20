@@ -6,7 +6,7 @@ import useGeminiGenerateContent from '../../gemini/services/generate-content'
 import useOpenAIGenerateContent from '../../openai/services/generate-content'
 import { ChatMessage } from '../types/chat'
 import { LogSeqDocument } from '../../logseq/types/logseq'
-import { Embedding } from '../types/gpt'
+import { Embedding } from '../../shared/types/gpt'
 import useSettingsStore from '../../logseq/stores/useSettingsStore'
 import { AIProvider } from '../../logseq/types/settings'
 

@@ -1,51 +1,67 @@
 import React, { ReactNode } from 'react'
 import Markdown from 'markdown-to-jsx'
+import MermaidRenderer from './MermaidRenderer'
 
 type Props = {
   markdown: string
   className?: string
 }
 
-const H1: React.FC<{children: ReactNode}> =
+const H1: React.FC<React.HTMLProps<HTMLHeadingElement>> =
   ({children, ...props}) => <h1 {...props}>{children}</h1>
-const H2: React.FC<{children: ReactNode}> =
+const H2: React.FC<React.HTMLProps<HTMLHeadingElement>> =
   ({children, ...props}) => <h2 {...props}>{children}</h2>
-const H3: React.FC<{children: ReactNode}> =
+const H3: React.FC<React.HTMLProps<HTMLHeadingElement>> =
   ({children, ...props}) => <h3 {...props}>{children}</h3>
-const H4: React.FC<{children: ReactNode}> =
+const H4: React.FC<React.HTMLProps<HTMLHeadingElement>> =
   ({children, ...props}) => <h4 {...props}>{children}</h4>
-const P: React.FC<{children: ReactNode}> =
+const P: React.FC<React.HTMLProps<HTMLParagraphElement>> =
   ({children, ...props}) => <p {...props}>{children}</p>
-const BQ: React.FC<{children: ReactNode}> =
+const BQ: React.FC<React.HTMLProps<HTMLQuoteElement>> =
   ({children, ...props}) => (
     <blockquote {...props}>
       <p>{children}</p>
     </blockquote>
   )
-const UL: React.FC<{children: ReactNode}> =
+const UL: React.FC<React.HTMLProps<HTMLUListElement>> =
   ({children, ...props}) => (
     <ul {...props}>
       {children}
     </ul>
   )
-const OL: React.FC<{children: ReactNode}> =
+const OL: React.FC<React.HTMLProps<HTMLOListElement>> =
   ({children, ...props}) => (
+    //@ts-ignore
     <ol {...props}>
       {children}
     </ol>
   )
-const LI: React.FC<{children: ReactNode}> =
+const LI: React.FC<React.HTMLProps<HTMLLIElement>> =
   ({children, ...props}) => (
     <li {...props}>
       {children}
     </li>
   )
-const A: React.FC<{children: ReactNode}> =
+const A: React.FC<React.HTMLProps<HTMLAnchorElement>> =
   ({children, ...props}) => (
     <a {...props}>
       {children}
     </a>
   )
+
+const CODE_LANG_MERMAID = "lang-mermaid"
+
+const CODE: React.FC<React.HTMLProps<HTMLDivElement>> = ({children, ...props}) => {
+  
+  // eslint-disable-next-line react/prop-types
+  if (props.className === CODE_LANG_MERMAID) {
+    return (
+      <MermaidRenderer chart={children as string} className="w-full" />
+    )
+  }
+
+  return <code>{children}</code>
+}
 
 const MarkdownRenderer: React.FC<Props> = ({markdown, className}) => {
   return (
@@ -119,6 +135,7 @@ const MarkdownRenderer: React.FC<Props> = ({markdown, className}) => {
                 className: "font-medium text-primary-800 underline dark:text-primary-500 hover:no-underline",
               }
             },
+            code: CODE,
           },
         }}
       >

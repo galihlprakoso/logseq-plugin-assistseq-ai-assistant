@@ -1,26 +1,36 @@
-# AssistSeq - AI Assistant
+# AssistSeq - Your Intelligent AI Assistant for Logseq
 
 <div align="center">
   <img src="./logo.png" width="160" />
 </div>
 
 <div align="center">
-  This plugin will <b>analyze</b> the <b>currently open document</b> and all <b>related documents</b>, utilizing them as <b>context</b> for your <b>conversation</b> with your favourite GPT model.
+  Elevate your Logseq experience with AssistSeq – an elegant and smart AI assistant that seamlessly integrates with your workflow. AssistSeq analyzes your <b>current document</b> and all <b>related notes</b>, leveraging them as <b>context</b> for insightful conversations with your preferred GPT model.
 </div>
 
-## Demo
+## Experience AssistSeq in Action
 <div align="center">
   <img src="./demo/assistseq-demo-tortoise.gif" />
 </div>
 
-## Providers
-- Gemini
-- OpenAI
+## Standout Features
+### Contextual Conversation
+Unlock deeper understanding with AssistSeq. This plugin automatically reads your current document and indexes all related notes. The AI then uses this comprehensive context to engage in meaningful conversations through a sleek chat interface. (Check out the demo above).
+
+### Smart Visualization
+<div align="center">
+  <img src="./images/visualization-chat-mermaidjs.png" />
+</div>
+Turn complexity into clarity. AssistSeq’s AI can visualize concepts to help you grasp ideas quickly. Whether you need to summarize, explain, or conceptualize, AssistSeq brings your documents to life with powerful visual aids.
+
+## Supported AI Providers
+- [Gemini](https://gemini.google.com/)
+- [OpenAI](https://openai.com/)
 
 ## What is Logseq?
-Logseq is a privacy-first, open-source knowledge base. Visit https://logseq.com for more information.
+Logseq is a privacy-first, open-source knowledge base designed for lifelong learners. Discover more at https://logseq.com.
 
-## Support Me
+## Support My Work
 <div align="center">
   <a href="https://buymeacoffee.com/ghackdev" target="_blank">
     <img src="./images/buymeacoffee.png" width="200" />
@@ -28,4 +38,4 @@ Logseq is a privacy-first, open-source knowledge base. Visit https://logseq.com 
 </div>
 
 ## License
-<a href="https://github.com/galihlprakoso/logseq-plugin-assistseq-ai-assistant/blob/master/LICENSE">MIT License</a>
+This project is licensed under the <a href="https://github.com/galihlprakoso/logseq-plugin-assistseq-ai-assistant/blob/master/LICENSE">MIT License</a>.

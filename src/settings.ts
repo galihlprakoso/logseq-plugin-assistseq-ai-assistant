@@ -107,6 +107,13 @@ const settings: SettingSchemaDesc[] = [
     description: 'How deep is the documents related to the current document will be included.',
     default: 5,
   },
+  {
+    key: 'includeVisualization',
+    type: 'boolean',
+    title: 'Include Visualization?',
+    description: 'Do you want to include visualization? (AI can draw visualization for you using charts and diagrams)',
+    default: true,
+  },
 ];
 
 export default settings;

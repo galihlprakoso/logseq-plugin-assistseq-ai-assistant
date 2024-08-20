@@ -16,4 +16,5 @@ export type LogSeqSettings = {
   blacklistedKeywords: string
   maxRecursionDepth: number
   includeDatePage: boolean
+  includeVisualization: boolean
 }

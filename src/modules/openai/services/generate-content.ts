@@ -1,23 +1,12 @@
 import { useMutation } from "react-query"
 import useSettingsStore from '../../logseq/stores/useSettingsStore'
-import { Embedding } from "../../chat/types/gpt"
+import { Embedding } from "../../shared/types/gpt"
 import { ChatMessage, ChatMessageRoleEnum } from "../../chat/types/chat"
 import { cosineSimilarity } from "../../shared/utils/math"
 import useOpenAIClient from "../hooks/useOpenAIClient"
 import useGeminiClient from "../../gemini/hooks/useGeminiClient"
 import { GeminiAIModelEnum } from "../../gemini/types/models"
-
-const buildPrompt = (query: string, relevantEmbeddings: Embedding[], relatedEmbeddings: Embedding[]) => {  
-  return `You are an AI assistant of a LogSeq plugin for LogSeq user.
-Please answer user's query (please format your answer using markdown syntax) based on relevant documents below (When a document mentions another document's title by using this syntax: [[another document title]], it means that the document have relation with those other mentioned document.) Please answer only the query below based on the document, don't mention anything about LogSeq plugin, your output will be directly displayed to the users of this plugin.:
-
-QUERY: ${query}
-RELEVANT DOCUMENTS: 
-${relevantEmbeddings.map((document, idx) => `Doc ${idx + 1}:\nDoc Title: ${document.title}\nDoc Content:\n${document.text}\n`)}
-RELATED DOCUMENTS:
-${relatedEmbeddings.map((document, idx) => `Doc ${idx + 1}:\nDoc Title: ${document.title}\nDoc Content:\n${document.text}\n`)}
-`
-}
+import { buildPrompt } from "../../shared/utils/prompt"
 
 const useGenerateContent = () => {
   const { openAI } = useOpenAIClient()
@@ -48,7 +37,12 @@ const useGenerateContent = () => {
           relevantEmbeddingsTitleMap[doc.title] = true
         })
 
-        const prompt = buildPrompt(query, relevantEmbeddings, embeddings.filter((doc) => !relevantEmbeddingsTitleMap[doc.title]))
+        const prompt = buildPrompt(
+          query, 
+          relevantEmbeddings,
+          embeddings.filter((doc) => !relevantEmbeddingsTitleMap[doc.title]),
+          settings.includeVisualization
+        )
 
         //@ts-ignore
         return openAI.chat.completions.create({

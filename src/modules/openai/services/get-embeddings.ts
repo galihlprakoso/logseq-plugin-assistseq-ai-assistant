@@ -1,6 +1,6 @@
 import { useMutation } from 'react-query'
 import { useMemo } from 'react'
-import { Embedding } from '../../chat/types/gpt'
+import { Embedding } from '../../shared/types/gpt'
 import { LogSeqDocument } from '../../logseq/types/logseq'
 import useOpenAIClient from '../hooks/useOpenAIClient'
 import { OpenAIModelEnum } from '../types/models'
