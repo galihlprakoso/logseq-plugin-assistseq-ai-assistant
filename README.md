@@ -10,7 +10,7 @@
 
 ## Demo
 <div align="center">
-  <img src="./demo/assistseq-demo.gif" />
+  <img src="./demo/assistseq-demo-tortoise.gif" />
 </div>
 
 ## Providers
