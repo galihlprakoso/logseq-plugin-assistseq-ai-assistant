@@ -1,7 +1,7 @@
 # AssistSeq - Your Intelligent AI Assistant for Logseq
 
 <div align="center">
-  <img src="./logo.png" width="160" />
+  <img src="https://github.com/galihlprakoso/logseq-plugin-assistseq-ai-assistant/raw/master/logo.png" width="160" />
 </div>
 
 <div align="center">
@@ -10,7 +10,7 @@
 
 ## Experience AssistSeq in Action
 <div align="center">
-  <img src="./demo/assistseq-demo-tortoise.gif" />
+  <img src="https://github.com/galihlprakoso/logseq-plugin-assistseq-ai-assistant/raw/master/demo/assistseq-demo-tortoise.gif" />
 </div>
 
 ## Standout Features
@@ -19,7 +19,7 @@ Unlock deeper understanding with AssistSeq. This plugin automatically reads your
 
 ### Smart Visualization
 <div align="center">
-  <img src="./images/visualization-chat-mermaidjs.png" />
+  <img src="https://github.com/galihlprakoso/logseq-plugin-assistseq-ai-assistant/raw/master/images/visualization-chat-mermaidjs.png" />
 </div>
 Turn complexity into clarity. AssistSeq’s AI can visualize concepts to help you grasp ideas quickly. Whether you need to summarize, explain, or conceptualize, AssistSeq brings your documents to life with powerful visual aids.
 
@@ -33,7 +33,7 @@ Logseq is a privacy-first, open-source knowledge base designed for lifelong lear
 ## Support My Work
 <div align="center">
   <a href="https://buymeacoffee.com/ghackdev" target="_blank">
-    <img src="./images/buymeacoffee.png" width="200" />
+    <img src="https://github.com/galihlprakoso/logseq-plugin-assistseq-ai-assistant/raw/master/images/buymeacoffee.png" width="200" />
   </a>
 </div>
 
