@@ -101,7 +101,7 @@ const MainScreen: React.FC<Props> = () => {
   if (documentsLoading || !currentPage) {
     return (
       <Card className="h-full relative flex items-center justify-center">
-        <LoadingIndicator text="Loading your documents..." />
+        <LoadingIndicator text="Loading your LogSeq documents..." />
       </Card>
     )
   }
