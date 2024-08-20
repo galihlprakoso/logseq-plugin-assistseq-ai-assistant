@@ -1,4 +1,4 @@
-# BrainSeq - AI Assistant
+# AssistSeq - AI Assistant
 
 <div align="center">
   <img src="./logo.png" width="160" />
