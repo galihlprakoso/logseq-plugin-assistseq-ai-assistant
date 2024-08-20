@@ -25,8 +25,10 @@ const ChatBox: React.FC<Props> = ({currentPageName, isSendEnabled, onQuerySend, 
   const messagesData = useMemo(() => messages[currentPageName] || [], [messages, currentPageName])
 
   const onQuerySendButtonClicked = useCallback(() => {
-    onQuerySend(query)
-    setQuery('')
+    if (query) {
+      onQuerySend(query)
+      setQuery('')
+    }
   }, [query, onQuerySend])
 
   const providerModel = useMemo(() => {
