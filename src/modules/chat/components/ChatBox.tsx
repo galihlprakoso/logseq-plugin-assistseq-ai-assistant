@@ -98,7 +98,7 @@ const ChatBox: React.FC<Props> = ({currentPageName, isSendEnabled, onQuerySend, 
             //@ts-ignore
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={(e) => {
-              if(e.key === KEYDOWN_ENTER) {
+              if(e.key === KEYDOWN_ENTER && !e.shiftKey) {
                 onQuerySendButtonClicked()
               }
             }}
