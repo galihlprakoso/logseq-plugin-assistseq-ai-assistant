@@ -97,7 +97,7 @@ const settings: SettingSchemaDesc[] = [
     key: 'includeDatePage',
     type: 'boolean',
     title: 'Include Date Page?',
-    description: 'Do you want to include date page as context to any AI Conversation?',
+    description: 'Do you want to include date page ([[August 24th, 2024]]) as context to any AI Conversation?',
     default: false,
   },
   {
