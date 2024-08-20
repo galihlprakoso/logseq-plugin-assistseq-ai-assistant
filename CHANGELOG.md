@@ -1,3 +1,10 @@
+## [1.1.1](https://github.com/galihlprakoso/logseq-plugin-assistseq-ai-assistant/compare/v1.1.0...v1.1.1) (2024-08-20)
+
+
+### Bug Fixes
+
+* fix readme failed to fetch images ([509a029](https://github.com/galihlprakoso/logseq-plugin-assistseq-ai-assistant/commit/509a02951bba4ac724081f5eed616fb186be9c9c))
+
 # [1.1.0](https://github.com/galihlprakoso/logseq-plugin-assistseq-ai-assistant/compare/v1.0.1...v1.1.0) (2024-08-20)
 
 
