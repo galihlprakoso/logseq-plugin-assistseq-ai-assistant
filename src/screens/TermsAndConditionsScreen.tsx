@@ -14,7 +14,7 @@ All API keys provided by the user for the Plugin’s operation are stored locall
 
 ### 2. **Data Privacy and Security**
 The Plugin accesses your LogSeq documents to provide context-aware assistance. While the developer has implemented certain features to enhance data privacy and security, such as:
-   - **Page and Word Blacklists:** Users can specify pages and words to exclude from the Plugin’s context, preventing sensitive information from being processed.
+   - **Page and Word Blacklists:** Users can specify pages and words to exclude from the Plugin's context, preventing sensitive information from being processed.
    
    Despite these measures, the developer cannot guarantee absolute security of your data. Users are responsible for ensuring that their data is protected. The developer is not liable for any data breaches, leaks, or unintended disclosures that may occur while using the Plugin.
 
