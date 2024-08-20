@@ -20,5 +20,12 @@
 ## What is Logseq?
 Logseq is a privacy-first, open-source knowledge base. Visit https://logseq.com for more information.
 
+## Support Me
+<div align="center">
+  <a href="https://buymeacoffee.com/ghackdev" target="_blank">
+    <img src="./images/buymeacoffee.png" />
+  </a>
+</div>
+
 ## License
 <a href="https://github.com/galihlprakoso/logseq-plugin-assistseq-ai-assistant/blob/master/LICENSE">MIT License</a>
