@@ -23,7 +23,7 @@ Logseq is a privacy-first, open-source knowledge base. Visit https://logseq.com 
 ## Support Me
 <div align="center">
   <a href="https://buymeacoffee.com/ghackdev" target="_blank">
-    <img src="./images/buymeacoffee.png" />
+    <img src="./images/buymeacoffee.png" width="200" />
   </a>
 </div>
 
