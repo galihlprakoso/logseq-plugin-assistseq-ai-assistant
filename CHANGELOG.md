@@ -1,3 +1,10 @@
+## [1.1.2](https://github.com/galihlprakoso/logseq-plugin-assistseq-ai-assistant/compare/v1.1.1...v1.1.2) (2024-08-22)
+
+
+### Bug Fixes
+
+* fix visualization feature error: https://github.com/galihlprakoso/logseq-plugin-assistseq-ai-assistant/issues/1 ([1357f9c](https://github.com/galihlprakoso/logseq-plugin-assistseq-ai-assistant/commit/1357f9c00e9a545df003e4cee5efc32c22e49f8a))
+
 ## [1.1.1](https://github.com/galihlprakoso/logseq-plugin-assistseq-ai-assistant/compare/v1.1.0...v1.1.1) (2024-08-20)
 
 
