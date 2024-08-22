@@ -1,6 +1,6 @@
-import React, { ReactNode } from 'react'
+import React from 'react'
 import Markdown from 'markdown-to-jsx'
-import MermaidRenderer from './MermaidRenderer'
+import DiagramRenderer from './DiagramRenderer'
 
 type Props = {
   markdown: string
@@ -49,14 +49,23 @@ const A: React.FC<React.HTMLProps<HTMLAnchorElement>> =
     </a>
   )
 
-const CODE_LANG_MERMAID = "lang-mermaid"
+const CODE_LANG_KROKI = "kroki-"
 
 const CODE: React.FC<React.HTMLProps<HTMLDivElement>> = ({children, ...props}) => {
   
   // eslint-disable-next-line react/prop-types
-  if (props.className === CODE_LANG_MERMAID) {
+  const className = (props.className || '') as string
+
+  if (className.includes(CODE_LANG_KROKI)) {
+    const diagram = children as string
+    const tmp =  className.split('-')
+
     return (
-      <MermaidRenderer chart={children as string} className="w-full" />
+      <DiagramRenderer
+        diagram={diagram}
+        provider={tmp.length > 0 ? tmp[tmp.length - 1] : null}
+        className="w-full"
+      />
     )
   }
 
