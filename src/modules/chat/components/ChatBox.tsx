@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from "react"
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import TextArea from '../../shared/components/TextArea'
 import ChatBubble from './ChatBubble'
 import MarkdownRenderer from '../../shared/components/MarkdownRenderer'
@@ -21,6 +21,7 @@ const ChatBox: React.FC<Props> = ({currentPageName, isSendEnabled, onQuerySend, 
   const {settings} = useSettingsStore()
   const [query, setQuery] = useState<string>('')
   const { messages, clearChat } = useChatStore()
+  const bottomChatRef = useRef<HTMLDivElement | null>(null)
 
   const messagesData = useMemo(() => messages[currentPageName] || [], [messages, currentPageName])
 
@@ -40,12 +41,18 @@ const ChatBox: React.FC<Props> = ({currentPageName, isSendEnabled, onQuerySend, 
     return ''
   }, [settings])
 
+  useEffect(() => {
+    if (bottomChatRef.current) {
+      bottomChatRef.current.scrollIntoView({ behavior: 'smooth' })
+    }
+  }, [messagesData])
+
   return (
     <div className="h-full relative">
-      <div className="h-full overflow-y-scroll">
+      <div className="h-full overflow-y-scroll" >
         {messagesData.length > 0 ? (
           <div className="pb-36 px-4 pt-24 flex flex-col justify-end">
-            {messagesData.reverse().map((message) => message.role === ChatMessageRoleEnum.User ? 
+            {messagesData.map((message) => message.role === ChatMessageRoleEnum.User ? 
               <div key={message.id} className="w-full flex justify-end">
                 <ChatBubble className="w-3/5 mb-8">
                   <p className="text-gray-800 dark:text-gray-400">{message.content}</p>
@@ -88,6 +95,7 @@ const ChatBox: React.FC<Props> = ({currentPageName, isSendEnabled, onQuerySend, 
             </p>
           </div> 
         )}
+        <div className="float-left clear-both" ref={bottomChatRef} />
       </div>      
 
       <div className="absolute bottom-0 left-0 right-0 flex flex-row px-4 pb-4 bg-white">
