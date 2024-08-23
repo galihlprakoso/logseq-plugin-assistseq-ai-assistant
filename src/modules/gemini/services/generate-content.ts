@@ -1,41 +1,25 @@
 import { useMutation } from "react-query"
 import useGeminiClient from '../hooks/useGeminiClient'
 import useSettingsStore from '../../logseq/stores/useSettingsStore'
-import { GeminiAIModelEnum } from "../types/models"
 import { Embedding } from "../../shared/types/gpt"
 import { ChatMessage, ChatMessageRoleEnum } from "../../chat/types/chat"
-import { cosineSimilarity } from "../../shared/utils/math"
 import { buildPrompt } from "../../shared/utils/prompt"
+import useGetRelevantEmbeddings from "../../chat/services/get-relevant-embeddings"
 
 const useGenerateContent = () => {
   const { gemini } = useGeminiClient()
   const { settings } = useSettingsStore()
+  const { getRelevantEmbeddings } = useGetRelevantEmbeddings()
+
 
   return useMutation({
-    mutationFn: async ({prevContents, query, embeddings}: {prevContents: ChatMessage[], query: string, embeddings: Embedding[]}) => {
+    mutationFn: async ({prevContents, query, embeddings}: {prevContents: ChatMessage[], query: string, embeddings: Embedding[]}) => {            
       if (gemini) {
         const model = gemini.getGenerativeModel({
           model: settings.geminiModel,
         })
-        const embeddingModel = gemini.getGenerativeModel({ model: GeminiAIModelEnum.TextEmbedding004 });
-
-        const queryEmbedding = await embeddingModel.embedContent(query)
-
-        const similarityScores: (Embedding & {score: number})[] = embeddings.map(doc => ({
-          title: doc.title,
-          embeddings: doc.embeddings,
-          text: doc.text,
-          score: cosineSimilarity(queryEmbedding.embedding.values, doc.embeddings)
-        }));
-
-        const sortedDocuments = similarityScores.sort((a, b) => b.score - a.score);
-        const relevantEmbeddings = sortedDocuments.filter(doc => doc.score > 0);
-
-        const relevantEmbeddingsTitleMap: Record<string, boolean> = {}
-
-        relevantEmbeddings.forEach((doc) => {
-          relevantEmbeddingsTitleMap[doc.title] = true
-        })
+        
+        const { relevantEmbeddings, relevantEmbeddingsTitleMap } = await getRelevantEmbeddings(query, embeddings)
 
         const prompt = buildPrompt(
           query,

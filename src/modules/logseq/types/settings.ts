@@ -4,6 +4,7 @@ import { OpenAIModelEnum } from "../../openai/types/models"
 export enum AIProvider {
   OpenAI = 'OpenAI',
   Gemini = 'Gemini',
+  Ollama = 'Ollama',
 }
 
 export type LogSeqSettings = {
@@ -17,4 +18,8 @@ export type LogSeqSettings = {
   maxRecursionDepth: number
   includeDatePage: boolean
   includeVisualization: boolean
+  embeddingProvider: AIProvider
+  ollamaEndpoint: string
+  ollamaModel: string
+  ollamaEmbeddingModel: string
 }

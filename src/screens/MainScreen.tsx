@@ -64,6 +64,21 @@ const MainScreen: React.FC<Props> = () => {
 
               i++
             }
+          } else if (settings.provider === AIProvider.Ollama) {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            for await (const chunk of (response as AsyncGenerator<any, void, unknown>)) {
+              if (i == 0) {
+                addMessage(currentPage.name, {
+                  id: messageId,
+                  content: chunk.message.content,
+                  role: ChatMessageRoleEnum.AI,
+                })
+              } else {
+                addTextToMessage(currentPage.name, messageId, chunk.message.content)
+              }
+
+              i++
+            }
           } else {
             for await (const chunk of (response as (ChatCompletion & Stream<ChatCompletionChunk>))) {
               const chunkText = chunk.choices[0]?.delta?.content || ''

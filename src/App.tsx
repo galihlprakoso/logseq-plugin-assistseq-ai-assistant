@@ -2,7 +2,7 @@ import React, { useCallback, useRef } from "react";
 import { useAppVisible } from "./utils";
 import useControlUI from './modules/logseq/services/control-ui'
 import useListenSettings from './modules/logseq/services/listen-settings'
-import NavigationView from "./modules/shared/components/NavigationView"
+import NavigationView from "./modules/navigation/components/NavigationView"
 import useGetCurrentPage from "./modules/logseq/services/get-current-page";
 
 function App() {

@@ -3,6 +3,7 @@ import { devtools, persist, createJSONStorage } from 'zustand/middleware'
 import { AIProvider, LogSeqSettings } from '../types/settings'
 import { GeminiAIModelEnum } from '../../gemini/types/models'
 import { OpenAIModelEnum } from '../../openai/types/models'
+import { OllamaEmbeddingModelEnum, OllamaModelEnum } from '../../ollama/types/models'
 
 interface SettingState {
   settings: LogSeqSettings
@@ -24,6 +25,10 @@ const useSettingsStore = create<SettingState>()(
           maxRecursionDepth: 5,
           includeDatePage: false,
           includeVisualization: true,
+          embeddingProvider: AIProvider.Gemini,
+          ollamaEndpoint: 'http://localhost:11434/',
+          ollamaModel: OllamaModelEnum.llama3_1,
+          ollamaEmbeddingModel: OllamaEmbeddingModelEnum.mxbai_embed_large,
         },
         setSettings: (settings: LogSeqSettings) => set(() => ({ settings })),
       }),
