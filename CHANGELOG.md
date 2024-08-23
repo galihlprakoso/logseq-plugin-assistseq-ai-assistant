@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/galihlprakoso/logseq-plugin-assistseq-ai-assistant/compare/v1.1.3...v1.2.0) (2024-08-23)
+
+
+### Features
+
+* Add Ollama LLM Support ([#2](https://github.com/galihlprakoso/logseq-plugin-assistseq-ai-assistant/issues/2)) ([dd79f17](https://github.com/galihlprakoso/logseq-plugin-assistseq-ai-assistant/commit/dd79f17ed369c6527cf23de4672c6af36fc64d91))
+
 ## [1.1.3](https://github.com/galihlprakoso/logseq-plugin-assistseq-ai-assistant/compare/v1.1.2...v1.1.3) (2024-08-23)
 
 
