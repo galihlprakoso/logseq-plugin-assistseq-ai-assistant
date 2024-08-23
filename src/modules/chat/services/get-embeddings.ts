@@ -113,12 +113,12 @@ const getOllamaEmbeddings = async (host: string, model: string, documents: LogSe
         })
       })
 
-      const embeddings = await embeddingsResponse.json()
+      const embeddingsResponseJson = await embeddingsResponse.json()
 
       const embedding = {
         title: uncachedDocuments[i].title,
         text: uncachedDocuments[i].content,
-        embeddings: embeddings.embedding,
+        embeddings: embeddingsResponseJson.embedding,
       }
 
       const cacheKey = getCacheKey(uncachedDocuments[i].title)

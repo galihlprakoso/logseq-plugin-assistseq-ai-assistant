@@ -21,6 +21,7 @@ const useGetRelevantEmbeddings = () => {
     } else {
 
       const embeddingsResponse = await fetch(`${settings.ollamaEndpoint}/api/embeddings`, {
+        method: 'POST',
         body: JSON.stringify({
           model: settings.ollamaEmbeddingModel,
           prompt: query,
