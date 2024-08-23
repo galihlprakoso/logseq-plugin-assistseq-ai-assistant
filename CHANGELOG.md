@@ -1,3 +1,10 @@
+## [1.1.3](https://github.com/galihlprakoso/logseq-plugin-assistseq-ai-assistant/compare/v1.1.2...v1.1.3) (2024-08-23)
+
+
+### Bug Fixes
+
+* flaky chat experience, inversed scroll, and add auto scroll ([86dce01](https://github.com/galihlprakoso/logseq-plugin-assistseq-ai-assistant/commit/86dce01d3d6068a3e8b70f90c4b030a9f79d17aa))
+
 ## [1.1.2](https://github.com/galihlprakoso/logseq-plugin-assistseq-ai-assistant/compare/v1.1.1...v1.1.2) (2024-08-22)
 
 
