@@ -8,6 +8,11 @@
   Elevate your Logseq experience with AssistSeq – an elegant and smart AI assistant that seamlessly integrates with your workflow. AssistSeq analyzes your <b>current document</b> and all <b>related notes</b>, leveraging them as <b>context</b> for insightful conversations with your preferred GPT model.
 </div>
 
+## Supported AI Providers
+- [Gemini](https://gemini.google.com/)
+- [OpenAI](https://openai.com/)
+- [Ollama](https://ollama.com/)
+
 ## Experience AssistSeq in Action
 <div align="center">
   <img src="https://github.com/galihlprakoso/logseq-plugin-assistseq-ai-assistant/raw/master/demo/assistseq-demo-tortoise.gif" />
@@ -22,10 +27,6 @@ Unlock deeper understanding with AssistSeq. This plugin automatically reads your
   <img src="https://github.com/galihlprakoso/logseq-plugin-assistseq-ai-assistant/raw/master/images/visualization-chat-mermaidjs.png" />
 </div>
 Turn complexity into clarity. AssistSeq’s AI can visualize concepts to help you grasp ideas quickly. Whether you need to summarize, explain, or conceptualize, AssistSeq brings your documents to life with powerful visual aids.
-
-## Supported AI Providers
-- [Gemini](https://gemini.google.com/)
-- [OpenAI](https://openai.com/)
 
 ## What is Logseq?
 Logseq is a privacy-first, open-source knowledge base designed for lifelong learners. Discover more at https://logseq.com.

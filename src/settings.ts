@@ -2,17 +2,30 @@ import { SettingSchemaDesc } from '@logseq/libs/dist/LSPlugin';
 import { GeminiAIModelEnum } from './modules/gemini/types/models';
 import { AIProvider } from './modules/logseq/types/settings';
 import { OpenAIModelEnum } from './modules/openai/types/models';
+import { OllamaEmbeddingModelEnum, OllamaModelEnum } from './modules/ollama/types/models';
 
 const settings: SettingSchemaDesc[] = [
   {
     key: 'provider',
     type: 'enum',
-    title: 'GPT Provider',
+    title: 'LLM Provider',
     description: 'Choose your preferred provider. (Currently, this plugin only support Gemini).',
     default: AIProvider.Gemini,
     enumChoices: [
       AIProvider.Gemini,
       AIProvider.OpenAI,
+      AIProvider.Ollama,
+    ]
+  },
+  {
+    key: 'embeddingProvider',
+    type: 'enum',
+    title: 'LLM Embedding Provider',
+    description: 'Choose your preferred embedding provider.',
+    default: AIProvider.Gemini,
+    enumChoices: [
+      AIProvider.Gemini,
+      AIProvider.Ollama,
     ]
   },
   {
@@ -69,6 +82,56 @@ const settings: SettingSchemaDesc[] = [
       OpenAIModelEnum.GPT3_5Turbo,
       OpenAIModelEnum.TextEmbeddingAda002,
     ]
+  },
+  {
+    key: 'ollamaSettings',
+    type: 'heading',
+    title: 'Ollama Settings',
+    description: 'Settings for Ollama provider.',
+    default: '',
+  },
+  {
+    key: 'ollamaEndpoint',
+    type: 'string',
+    title: 'Ollama Endpoint',
+    description: 'Your local Ollama endpoint (e.g http://localhost:11434)',
+    default: 'http://localhost:11434',
+  },
+  {
+    key: 'ollamaModel',
+    type: 'enum',
+    title: 'Ollama Model',
+    description: 'Select Ollama model',
+    default: OllamaModelEnum.llama3_1,
+    enumChoices: [
+      OllamaModelEnum.llama3_1,
+      OllamaModelEnum.gemma2,
+      OllamaModelEnum.mistral_nemo,
+      OllamaModelEnum.qwen2,
+      OllamaModelEnum.deepseek_coder_v2,
+      OllamaModelEnum.phi3,
+      OllamaModelEnum.mistral,
+      OllamaModelEnum.mixtral,
+      OllamaModelEnum.codegemma,
+      OllamaModelEnum.llama3,
+      OllamaModelEnum.command_r,
+      OllamaModelEnum.command_r_plus,
+      OllamaModelEnum.llava,
+      OllamaModelEnum.gemma,
+      OllamaModelEnum.codellama,
+    ],
+  },
+  {
+    key: 'ollamaEmbeddingModel',
+    type: 'enum',
+    title: 'Ollama Embedding Model',
+    description: 'Select Ollama embedding model',
+    default: OllamaEmbeddingModelEnum.mxbai_embed_large,
+    enumChoices: [
+      OllamaEmbeddingModelEnum.mxbai_embed_large,
+      OllamaEmbeddingModelEnum.nomic_embed_text,
+      OllamaEmbeddingModelEnum.all_minilm,
+    ],
   },
   {
     key: 'privacyControl',
