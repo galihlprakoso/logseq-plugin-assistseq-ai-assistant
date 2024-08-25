@@ -1,3 +1,5 @@
+# [2.0.0](https://github.com/galihlprakoso/logseq-plugin-assistseq-ai-assistant/compare/v1.2.0...v2.0.0) (2024-08-25)
+
 # [1.2.0](https://github.com/galihlprakoso/logseq-plugin-assistseq-ai-assistant/compare/v1.1.3...v1.2.0) (2024-08-23)
 
 
