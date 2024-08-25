@@ -1,9 +1,7 @@
 import { create } from 'zustand'
 import { devtools, persist, createJSONStorage } from 'zustand/middleware'
 import { AIProvider, LogSeqSettings } from '../types/settings'
-import { GeminiAIModelEnum } from '../../gemini/types/models'
-import { OpenAIModelEnum } from '../../openai/types/models'
-import { OllamaEmbeddingModelEnum, OllamaModelEnum } from '../../ollama/types/models'
+import { GeminiAIModelEnum, OllamaEmbeddingModelEnum, OllamaModelEnum, OpenAIModelEnum } from '../types/models'
 
 interface SettingState {
   settings: LogSeqSettings

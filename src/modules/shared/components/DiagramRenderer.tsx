@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from "react"
 import pako from 'pako'
-import LoadingIndicator from "./LoadingIndicator";
+import LoadingIndicator from "./LoadingIndicator"
 
 type Props = {
   diagram: string
@@ -10,27 +10,27 @@ type Props = {
 
 function textEncode(str: string) {
   if (window.TextEncoder) {
-    return new TextEncoder().encode(str);
+    return new TextEncoder().encode(str)
   }
-  const utf8 = unescape(encodeURIComponent(str));
-  const result = new Uint8Array(utf8.length);
+  const utf8 = unescape(encodeURIComponent(str))
+  const result = new Uint8Array(utf8.length)
   for (let i = 0; i < utf8.length; i++) {
-    result[i] = utf8.charCodeAt(i);
+    result[i] = utf8.charCodeAt(i)
   }
-  return result;
+  return result
 }
 
 const encodeDiagram = (diagram: string) => {
-  const data = textEncode(diagram);
-  const compressed_uint8array = pako.deflate(data);
+  const data = textEncode(diagram)
+  const compressed_uint8array = pako.deflate(data)
   
-  const byteArray = Array.from(compressed_uint8array);
+  const byteArray = Array.from(compressed_uint8array)
 
-  const binaryString = String.fromCharCode.apply(null, byteArray);
+  const binaryString = String.fromCharCode.apply(null, byteArray)
 
-  const b64encoded_string = btoa(binaryString).replace(/\+/g, '-').replace(/\//g, '_');
+  const b64encoded_string = btoa(binaryString).replace(/\+/g, '-').replace(/\//g, '_')
 
-  return b64encoded_string;
+  return b64encoded_string
 }
 
 const DiagramRenderer: React.FC<Props> = ({ diagram, provider, className }) => {

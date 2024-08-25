@@ -1,8 +1,6 @@
-import { SettingSchemaDesc } from '@logseq/libs/dist/LSPlugin';
-import { GeminiAIModelEnum } from './modules/gemini/types/models';
-import { AIProvider } from './modules/logseq/types/settings';
-import { OpenAIModelEnum } from './modules/openai/types/models';
-import { OllamaEmbeddingModelEnum, OllamaModelEnum } from './modules/ollama/types/models';
+import { SettingSchemaDesc } from '@logseq/libs/dist/LSPlugin'
+import { AIProvider } from './modules/logseq/types/settings'
+import { GeminiAIModelEnum, OllamaEmbeddingModelEnum, OllamaModelEnum, OpenAIModelEnum } from './modules/logseq/types/models'
 
 const settings: SettingSchemaDesc[] = [
   {
@@ -177,6 +175,6 @@ const settings: SettingSchemaDesc[] = [
     description: 'Do you want to include visualization? (AI can draw visualization for you using charts and diagrams)',
     default: true,
   },
-];
+]
 
-export default settings;
+export default settings

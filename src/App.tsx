@@ -1,16 +1,16 @@
-import React, { useCallback, useRef } from "react";
-import { useAppVisible } from "./utils";
-import useControlUI from './modules/logseq/services/control-ui'
-import useListenSettings from './modules/logseq/services/listen-settings'
+import React, { useCallback, useRef } from "react"
+import { useAppVisible } from "./utils"
+import useControlUI from './modules/logseq/hooks/control-ui'
+import useListenSettings from './modules/logseq/hooks/listen-settings'
 import NavigationView from "./modules/navigation/components/NavigationView"
-import useGetCurrentPage from "./modules/logseq/services/get-current-page";
+import useGetCurrentPage from "./modules/logseq/services/get-current-page"
 
 function App() {
   useGetCurrentPage()
   useListenSettings()
 
-  const innerRef = useRef<HTMLDivElement>(null);
-  const visible = useAppVisible();
+  const innerRef = useRef<HTMLDivElement>(null)
+  const visible = useAppVisible()
   const { hideMainUI, showSettingsUI } = useControlUI()
 
   const onBackdropClicked = useCallback<React.MouseEventHandler<HTMLElement>>((e) => {
@@ -47,10 +47,10 @@ function App() {
             <NavigationView />          
         </div>
       </main>
-    );
+    )
   }
 
-  return null;
+  return null
 }
 
-export default App;
+export default App

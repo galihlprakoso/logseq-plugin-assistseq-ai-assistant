@@ -1,29 +1,27 @@
-import { Embedding } from "../types/gpt"
-
-const KROKI_VISUALIZATION_PROMPT = `
+export const KROKI_VISUALIZATION_PROMPT = `
 If user ask you to visualize your explanation, or if you think that it's better to include visualization (block diagram, sequence diagram, activity, etc.),
 or if user is explicitely ask for visualization, You could use this plugin's Kroki feature. You could simply write your chat in Kroki's syntax in your markdown response. For example:
 Block diagram:
 \`\`\`kroki-blockdiag
 blockdiag {
-  blockdiag -> generates -> "block-diagrams";
-  blockdiag -> is -> "very easy!";
+  blockdiag -> generates -> "block-diagrams"
+  blockdiag -> is -> "very easy!"
 
-  blockdiag [color = "greenyellow"];
-  "block-diagrams" [color = "pink"];
-  "very easy!" [color = "orange"];
+  blockdiag [color = "greenyellow"]
+  "block-diagrams" [color = "pink"]
+  "very easy!" [color = "orange"]
 }
 \`\`\`
 
 Sequence Diagram:
 \`\`\`kroki-seqdiag
 seqdiag {
-  browser  -> webserver [label = "GET /index.html"];
-  browser <-- webserver;
-  browser  -> webserver [label = "POST /blog/comment"];
-  webserver  -> database [label = "INSERT comment"];
-  webserver <-- database;
-  browser <-- webserver;
+  browser  -> webserver [label = "GET /index.html"]
+  browser <-- webserver
+  browser  -> webserver [label = "POST /blog/comment"]
+  webserver  -> database [label = "INSERT comment"]
+  webserver <-- database
+  browser <-- webserver
 }
 \`\`\`
 
@@ -34,11 +32,11 @@ actdiag {
 
   lane user {
     label = "User"
-    write [label = "Writing reST"];
-    image [label = "Get diagram IMAGE"];
+    write [label = "Writing reST"]
+    image [label = "Get diagram IMAGE"]
   }
   lane actdiag {
-    convert [label = "Convert reST to Image"];
+    convert [label = "Convert reST to Image"]
   }
 }
 \`\`\`
@@ -801,38 +799,14 @@ can include the diagram by using this kind of code block:
 Block diagram:
 \`\`\`kroki-blockdiag
 blockdiag {
-  blockdiag -> generates -> "block-diagrams";
-  blockdiag -> is -> "very easy!";
+  blockdiag -> generates -> "block-diagrams"
+  blockdiag -> is -> "very easy!"
 
-  blockdiag [color = "greenyellow"];
-  "block-diagrams" [color = "pink"];
-  "very easy!" [color = "orange"];
+  blockdiag [color = "greenyellow"]
+  "block-diagrams" [color = "pink"]
+  "very easy!" [color = "orange"]
 }
 \`\`\`
 
-You should mention the name of the diagram \`kroki-{the name of the diagram}\`.
-
-You can see more here: https://kroki.io/examples.html#blockdiag
+You should mention the name of the diagram \`kroki-[the name of the diagram]\`.
 `
-
-export const buildPrompt = (
-  query: string,
-  relevantGeminiEmbeddings: Embedding[],
-  relatedGeminiEmbeddings: Embedding[],
-  includeVisualization: boolean
-) => {  
-  return `You are an AI assistant of a LogSeq plugin that will be used by LogSeq users.
-Please answer user's query (please format your answer using markdown syntax) based on relevant documents below. When a document mentions another document's title by using this syntax: [[another document title]], it means that the document have relation with those other mentioned document.
-Please answer only the query below based on the document, don't mention anything about LogSeq plugin, your output will be directly displayed to the users of this plugin.
-
-${includeVisualization ? KROKI_VISUALIZATION_PROMPT : ''}
-
-This is the document:
-
-QUERY: ${query}
-RELEVANT DOCUMENTS: 
-${relevantGeminiEmbeddings.map((document, idx) => `Doc ${idx + 1}:\nDoc Title: ${document.title}\nDoc Content:\n${document.text}\n`)}
-RELATED DOCUMENTS:
-${relatedGeminiEmbeddings.map((document, idx) => `Doc ${idx + 1}:\nDoc Title: ${document.title}\nDoc Content:\n${document.text}\n`)}
-`
-}
