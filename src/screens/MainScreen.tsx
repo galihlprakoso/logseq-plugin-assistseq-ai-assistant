@@ -112,7 +112,7 @@ const MainScreen: React.FC<Props> = () => {
               </svg>
               <h2 className="text-4xl text-gray-800 font-bold dark:text-white mt-4">Hello!</h2>
               <p className="mb-3 text-gray-500 text-center dark:text-gray-400 mt-2">
-                You can start asking a question based on your current page and it&aposs related documents as a context. Send your first message!
+                You can start asking a question based on your current page and it&apos;s related documents as a context. Send your first message!
               </p>
             </div> 
           )}
@@ -134,7 +134,7 @@ const MainScreen: React.FC<Props> = () => {
               value={query}
             />
             <div className="flex flex-row items-centers justify-between mt-1">
-              <span className="text-xs text-gray-500">{settings.provider} - {providerModel} &#x2022 {currentPageName}</span>
+              <span className="text-xs text-gray-500">{settings.provider} - {providerModel} &#x2022; {currentPageName}</span>
 
               <span
                 className="text-xs text-gray-500 underline cursor-pointer"

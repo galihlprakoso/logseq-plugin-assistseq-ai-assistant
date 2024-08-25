@@ -27,6 +27,8 @@ const useSettingsStore = create<SettingState>()(
           ollamaEndpoint: 'http://localhost:11434/',
           ollamaModel: OllamaModelEnum.llama3_1,
           ollamaEmbeddingModel: OllamaEmbeddingModelEnum.mxbai_embed_large,
+          includeTavilySearch: true,
+          tavilyAPIKey: '',
         },
         setSettings: (settings: LogSeqSettings) => set(() => ({ settings })),
       }),

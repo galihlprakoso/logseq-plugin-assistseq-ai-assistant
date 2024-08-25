@@ -1,13 +1,13 @@
 import React, { ReactNode, useMemo } from "react"
-import { Runnable, RunnableSequence } from "@langchain/core/runnables"
+import { Runnable, RunnableConfig, RunnableSequence } from "@langchain/core/runnables"
 import useSettingsStore from "../../logseq/stores/useSettingsStore"
 import { ChatGoogleGenerativeAI } from "@langchain/google-genai"
 import { ChatPromptTemplate, MessagesPlaceholder } from "@langchain/core/prompts"
 import { Ollama } from "@langchain/ollama"
 import { ChatOpenAI } from "@langchain/openai"
-import type { Document } from "@langchain/core/documents"
 import { StringOutputParser } from "@langchain/core/output_parsers";
 import { AIProvider } from "../../logseq/types/settings"
+import { getTavilyTool, TAVILY_TOOL_DESCRIPTION, TAVILY_TOOL_NAME, tavilySchema } from "../tools/tavily"
 
 const prompt = ChatPromptTemplate.fromMessages([
   [
@@ -27,9 +27,11 @@ DOCUMENTS:
 type LangChainContext = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   chain?: Runnable<any, string>
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  chainWithTools?: Runnable<any, unknown, RunnableConfig>
 }
 
-export const LangChainProviderContext = React.createContext<LangChainContext>({ chain: undefined })
+export const LangChainProviderContext = React.createContext<LangChainContext>({ chain: undefined, chainWithTools: undefined })
 
 type Props = {
   children: ReactNode
@@ -80,12 +82,45 @@ const LangChainContextProvider: React.FC<Props> = ({ children }) => {
     }
   }, [geminiModel, ollamaModel, openAIModel, settings.provider])
 
+  const chainWithTools = useMemo(() => {
+    let model = undefined
+
+    if (selectedModel && settings.includeTavilySearch && settings.tavilyAPIKey) {
+      const tavilyTool = {
+        schema: tavilySchema,
+        name: TAVILY_TOOL_NAME,
+        description: TAVILY_TOOL_DESCRIPTION,
+      }
+
+      if ([AIProvider.Gemini, AIProvider.OpenAI].includes(settings.provider)) {
+        //@ts-ignore
+        model = selectedModel.bindTools([tavilyTool])
+      } else {
+        //@ts-ignore
+        model = selectedModel.bind({
+          tools: [
+            tavilyTool,
+          ]
+        }) 
+      }
+
+      if (model) {
+        return prompt.pipe(model)
+      } else {
+        return undefined
+      }
+    }
+
+    return model
+  }, [selectedModel, settings.includeTavilySearch, settings.provider, settings.tavilyAPIKey])
+
   const chain = useMemo(() => {
     if (selectedModel) {
+
       const chain = RunnableSequence.from([
         prompt,        
         selectedModel,
-        new StringOutputParser()
+        new StringOutputParser(),
       ])
 
       return chain
@@ -95,7 +130,10 @@ const LangChainContextProvider: React.FC<Props> = ({ children }) => {
   }, [selectedModel])
 
   return (
-    <LangChainProviderContext.Provider value={{chain}}>
+    <LangChainProviderContext.Provider value={{
+      chain,
+      chainWithTools,
+    }}>
       {children}
     </LangChainProviderContext.Provider>
   )

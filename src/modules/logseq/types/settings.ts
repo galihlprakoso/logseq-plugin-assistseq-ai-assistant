@@ -1,5 +1,4 @@
-import { GeminiAIModelEnum } from "../../gemini/types/models"
-import { OpenAIModelEnum } from "../../openai/types/models"
+import { GeminiAIModelEnum, OpenAIModelEnum } from "./models"
 
 export enum AIProvider {
   OpenAI = 'OpenAI',
@@ -22,4 +21,6 @@ export type LogSeqSettings = {
   ollamaEndpoint: string
   ollamaModel: string
   ollamaEmbeddingModel: string
+  includeTavilySearch: boolean
+  tavilyAPIKey: string
 }

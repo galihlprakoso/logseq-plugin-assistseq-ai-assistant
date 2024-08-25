@@ -37,7 +37,7 @@ const settings: SettingSchemaDesc[] = [
     key: 'geminiApiKey',
     type: 'string',
     title: 'Gemini API Key',
-    description: 'Your Gemini API Key (This key will saved locally).',
+    description: 'Your Gemini API Key (This key will saved locally). https://ai.google.dev/gemini-api/docs/api-key',
     default: '',
   },
   {
@@ -63,7 +63,7 @@ const settings: SettingSchemaDesc[] = [
     key: 'openAiApiKey',
     type: 'string',
     title: 'OpenAI API Key',
-    description: 'Your OpenAI API Key (This key will saved locally).',
+    description: 'Your OpenAI API Key (This key will saved locally). https://platform.openai.com/api-keys',
     default: '',
   },
   {
@@ -174,6 +174,27 @@ const settings: SettingSchemaDesc[] = [
     title: 'Include Visualization?',
     description: 'Do you want to include visualization? (AI can draw visualization for you using charts and diagrams)',
     default: true,
+  },
+  {
+    key: 'tavilySearch',
+    type: 'heading',
+    title: 'Tavily Search',
+    description: 'Tavily Search API is a search engine optimized for LLMs, aimed at efficient, quick and persistent search results.',
+    default: '',
+  },
+  {
+    key: 'includeTavilySearch',
+    type: 'boolean',
+    title: 'Include Tavily Search?',
+    description: 'Do you want to include Tavily Search Engine results?',
+    default: true,
+  },
+  {
+    key: 'tavilyAPIKey',
+    type: 'string',
+    title: 'Tavily API Key',
+    description: 'Your Tavily API Key (This key will saved locally). https://app.tavily.com/home ',
+    default: '',
   },
 ]
 

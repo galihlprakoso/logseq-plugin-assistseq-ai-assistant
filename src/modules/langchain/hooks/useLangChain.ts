@@ -2,9 +2,9 @@ import { useContext } from "react"
 import { LangChainProviderContext } from "../components/LangChainContextProvider"
 
 const useLangChain = () => {
-  const { chain } = useContext(LangChainProviderContext)
+  const langchain = useContext(LangChainProviderContext)
 
-  return chain
+  return langchain
 }
 
 export default useLangChain

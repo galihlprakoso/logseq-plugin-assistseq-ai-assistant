@@ -24,7 +24,7 @@ export class LogSeqRelevantDocumentRetreiver extends BaseRetriever {
     return !!obj && typeof obj === 'object' && 'content' in obj
   }  
   
-  async appendBlockContent(
+  private async appendBlockContent(
     block: BlockEntity,
     depth: number,
     settings: LogSeqSettings,
@@ -54,7 +54,7 @@ export class LogSeqRelevantDocumentRetreiver extends BaseRetriever {
     return content
   }
   
-  async getDocumentsRecursively(
+  private async getDocumentsRecursively(
     pageName: string,
     documents: LogSeqDocument[],
     visitedPages: Set<string>,
