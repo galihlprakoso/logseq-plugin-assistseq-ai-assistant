@@ -1,8 +1,6 @@
-import { SettingSchemaDesc } from '@logseq/libs/dist/LSPlugin';
-import { GeminiAIModelEnum } from './modules/gemini/types/models';
-import { AIProvider } from './modules/logseq/types/settings';
-import { OpenAIModelEnum } from './modules/openai/types/models';
-import { OllamaEmbeddingModelEnum, OllamaModelEnum } from './modules/ollama/types/models';
+import { SettingSchemaDesc } from '@logseq/libs/dist/LSPlugin'
+import { AIProvider } from './modules/logseq/types/settings'
+import { GeminiAIModelEnum, OllamaEmbeddingModelEnum, OllamaModelEnum, OpenAIModelEnum } from './modules/logseq/types/models'
 
 const settings: SettingSchemaDesc[] = [
   {
@@ -39,7 +37,7 @@ const settings: SettingSchemaDesc[] = [
     key: 'geminiApiKey',
     type: 'string',
     title: 'Gemini API Key',
-    description: 'Your Gemini API Key (This key will saved locally).',
+    description: 'Your Gemini API Key (This key will saved locally). https://ai.google.dev/gemini-api/docs/api-key',
     default: '',
   },
   {
@@ -65,7 +63,7 @@ const settings: SettingSchemaDesc[] = [
     key: 'openAiApiKey',
     type: 'string',
     title: 'OpenAI API Key',
-    description: 'Your OpenAI API Key (This key will saved locally).',
+    description: 'Your OpenAI API Key (This key will saved locally). https://platform.openai.com/api-keys',
     default: '',
   },
   {
@@ -177,6 +175,27 @@ const settings: SettingSchemaDesc[] = [
     description: 'Do you want to include visualization? (AI can draw visualization for you using charts and diagrams)',
     default: true,
   },
-];
+  {
+    key: 'tavilySearch',
+    type: 'heading',
+    title: 'Tavily Search',
+    description: 'Tavily Search API is a search engine optimized for LLMs, aimed at efficient, quick and persistent search results.',
+    default: '',
+  },
+  {
+    key: 'includeTavilySearch',
+    type: 'boolean',
+    title: 'Include Tavily Search?',
+    description: 'Do you want to include Tavily Search Engine results?',
+    default: true,
+  },
+  {
+    key: 'tavilyAPIKey',
+    type: 'string',
+    title: 'Tavily API Key',
+    description: 'Your Tavily API Key (This key will saved locally). https://app.tavily.com/home ',
+    default: '',
+  },
+]
 
-export default settings;
+export default settings

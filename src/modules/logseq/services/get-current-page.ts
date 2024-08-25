@@ -5,7 +5,8 @@ const useGetCurrentPage = () => {
     queryFn: () => {
       return window.logseq.Editor.getCurrentPage()
     },
-    queryKey: ['get-current-page']
+    queryKey: ['get-current-page'],
+    refetchOnWindowFocus: false,
   })
 }
 
