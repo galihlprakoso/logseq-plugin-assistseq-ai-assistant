@@ -34,7 +34,7 @@ const useSettingsStore = create<SettingState>()(
       }),
       {
         name: 'settings-store',
-        storage: createJSONStorage(() => sessionStorage),
+        storage: createJSONStorage(() => localStorage),
       },
     ),
   ),
