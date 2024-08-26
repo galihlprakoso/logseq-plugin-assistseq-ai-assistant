@@ -19,6 +19,7 @@
     "@langchain/ollama": "^0.0.4",
     "@langchain/openai": "^0.2.7",
     "@logseq/libs": "^0.0.14",
+    "cheerio": "^1.0.0",
     "flowbite": "^2.5.1",
     "flowbite-react": "^0.10.1",
     "langchain": "^0.2.17",

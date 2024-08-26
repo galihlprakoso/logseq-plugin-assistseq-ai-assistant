@@ -10,9 +10,10 @@ import useSettingsStore from "../../logseq/stores/useSettingsStore"
 import { KROKI_VISUALIZATION_PROMPT } from "../../shared/constants/prompts"
 import { LogSeqRelevantDocumentRetreiver } from "../../langchain/document-retrievers/LogSeqRelatedDocumentRetreiver"
 import { Document } from "@langchain/core/documents"
-import { getTavilyTool, TAVILY_TOOL_DESCRIPTION, TAVILY_TOOL_NAME, tavilySchema } from "../../langchain/tools/tavily"
+import { getTavilyTool, tavilyTool } from "../../langchain/tools/tavily"
 import { tool } from "@langchain/core/tools"
 import { Runnable } from "@langchain/core/runnables"
+import { cheerioTool, getURLContentTool } from "../../langchain/tools/cheerio"
 
 
 const formatDocumentsAsString = (documents: Document[]) => {
@@ -41,13 +42,13 @@ const useChat = () => {
 
   const toolsByName = useMemo<Record<string, Runnable>>(() => {
     return {
-      [TAVILY_TOOL_NAME]: tool(
+      [tavilyTool.name]: tool(
         getTavilyTool(settings.tavilyAPIKey),
-        {
-          name: TAVILY_TOOL_NAME,
-          schema: tavilySchema,
-          description: TAVILY_TOOL_DESCRIPTION,
-        }
+        tavilyTool,
+      ),
+      [cheerioTool.name]: tool(
+        getURLContentTool,
+        cheerioTool,
       )
     }
   }, [settings.tavilyAPIKey])

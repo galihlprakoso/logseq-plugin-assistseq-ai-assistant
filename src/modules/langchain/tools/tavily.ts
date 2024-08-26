@@ -1,9 +1,6 @@
 import { z } from "zod";
 
-export const TAVILY_TOOL_NAME = "globalsearch"
-export const TAVILY_TOOL_DESCRIPTION = "Whenever user ask anything that doesn't exists on provided documents, you should directly decide use this tool to look for anything."
-
-export const tavilySchema = z.object({
+export const schema = z.object({
   topic: z
     .enum(["general", "news"])
     .describe("The category of the document search. (optional)")
@@ -38,4 +35,10 @@ export const getTavilyTool = (api_key: string) => async ({ topic, days, query }:
 URL: ${result.url}
 Content: ${result.content}
 Score: ${result.score}\n`).join("------------------\n")
+}
+
+export const tavilyTool = {
+  schema,
+  name: "globalsearch",
+  description: "Whenever user ask anything that doesn't exists on provided documents, you should directly decide use this tool to look for anything.",
 }
