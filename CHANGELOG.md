@@ -1,3 +1,10 @@
+# [2.1.0](https://github.com/galihlprakoso/logseq-plugin-assistseq-ai-assistant/compare/v2.0.0...v2.1.0) (2024-08-26)
+
+
+### Features
+
+* move session storage to local storage and add web scrapping tool ([#4](https://github.com/galihlprakoso/logseq-plugin-assistseq-ai-assistant/issues/4)) ([b626885](https://github.com/galihlprakoso/logseq-plugin-assistseq-ai-assistant/commit/b62688504a1d25df079b4492c0436faef3460c72))
+
 # [2.0.0](https://github.com/galihlprakoso/logseq-plugin-assistseq-ai-assistant/compare/v1.2.0...v2.0.0) (2024-08-25)
 
 # [1.2.0](https://github.com/galihlprakoso/logseq-plugin-assistseq-ai-assistant/compare/v1.1.3...v1.2.0) (2024-08-23)
