@@ -46,7 +46,7 @@ const useChatStore = create<ChatState>()(
       }),
       {
         name: 'chat-store',
-        storage: createJSONStorage(() => sessionStorage),
+        storage: createJSONStorage(() => localStorage),
       },
     ),
   ),

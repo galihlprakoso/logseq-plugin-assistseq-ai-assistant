@@ -15,7 +15,7 @@ const useFlagsStore = create<FlagsState>()(
       }),
       {
         name: 'flags-store',
-        storage: createJSONStorage(() => sessionStorage),
+        storage: createJSONStorage(() => localStorage),
       },
     ),
   ),

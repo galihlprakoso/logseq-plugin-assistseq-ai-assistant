@@ -7,7 +7,8 @@ import { Ollama } from "@langchain/ollama"
 import { ChatOpenAI } from "@langchain/openai"
 import { StringOutputParser } from "@langchain/core/output_parsers";
 import { AIProvider } from "../../logseq/types/settings"
-import { getTavilyTool, TAVILY_TOOL_DESCRIPTION, TAVILY_TOOL_NAME, tavilySchema } from "../tools/tavily"
+import { tavilyTool } from "../tools/tavily"
+import { cheerioTool } from "../tools/cheerio"
 
 const prompt = ChatPromptTemplate.fromMessages([
   [
@@ -85,21 +86,20 @@ const LangChainContextProvider: React.FC<Props> = ({ children }) => {
   const chainWithTools = useMemo(() => {
     let model = undefined
 
-    if (selectedModel && settings.includeTavilySearch && settings.tavilyAPIKey) {
-      const tavilyTool = {
-        schema: tavilySchema,
-        name: TAVILY_TOOL_NAME,
-        description: TAVILY_TOOL_DESCRIPTION,
-      }
-
+    if (selectedModel) {
+      
       if ([AIProvider.Gemini, AIProvider.OpenAI].includes(settings.provider)) {
         //@ts-ignore
-        model = selectedModel.bindTools([tavilyTool])
+        model = selectedModel.bindTools([
+          ...(settings.includeTavilySearch && settings.tavilyAPIKey) ? [tavilyTool] : [],
+          cheerioTool
+        ])
       } else {
         //@ts-ignore
         model = selectedModel.bind({
           tools: [
-            tavilyTool,
+            ...(settings.includeTavilySearch && settings.tavilyAPIKey) ? [tavilyTool] : [],
+            cheerioTool,
           ]
         }) 
       }
