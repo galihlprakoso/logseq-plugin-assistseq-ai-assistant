@@ -1,3 +1,10 @@
+# [2.2.0](https://github.com/galihlprakoso/logseq-plugin-assistseq-ai-assistant/compare/v2.1.0...v2.2.0) (2024-08-29)
+
+
+### Features
+
+* added groq provider support ([#5](https://github.com/galihlprakoso/logseq-plugin-assistseq-ai-assistant/issues/5)) ([17574e0](https://github.com/galihlprakoso/logseq-plugin-assistseq-ai-assistant/commit/17574e0bf1aa418dec4c98933437af5ac9b71834))
+
 # [2.1.0](https://github.com/galihlprakoso/logseq-plugin-assistseq-ai-assistant/compare/v2.0.0...v2.1.0) (2024-08-26)
 
 

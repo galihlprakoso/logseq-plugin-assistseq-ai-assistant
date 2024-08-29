@@ -1,6 +1,6 @@
 {
   "name": "logseq-plugin-assistseq-ai-assistant",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "main": "dist/index.html",
   "author": "galihlprakoso",
   "repository": {
