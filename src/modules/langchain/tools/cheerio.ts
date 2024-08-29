@@ -4,7 +4,7 @@ import * as cheerio from 'cheerio'
 const schema = z.object({
   url: z
     .string()
-    .describe("The website's URL.")
+    .describe("The website's URL you want to scrape.")
 });
 
 async function loadHTML(url: string) {
@@ -97,8 +97,29 @@ export const getURLContentTool = async ({ url }: {
   return mainContent;  
 }
 
+const NAME = "scrape_url"
+const DESC = "Whenever you found website URL on user's input / query, you should use this tool to parse the website's data on that url."
+
 export const cheerioTool = {
   schema,
-  name: "parseurl",
-  description: "Whenever you found website URL on user's input / query, you should use this tool to parse the website's data on that url.",
+  name: NAME,
+  description: DESC,
+}
+
+export const cheerioToolGroq = {
+  "type": "function",
+  "function": {
+      "name": NAME,
+      "description": DESC,
+      "parameters": {
+          "type": "object",
+          "properties": {
+              "url": {
+                  "type": "string",
+                  "description": "The website's URL you want to scrape.",
+              },
+          },
+          "required": ["url"],
+      },
+  },
 }

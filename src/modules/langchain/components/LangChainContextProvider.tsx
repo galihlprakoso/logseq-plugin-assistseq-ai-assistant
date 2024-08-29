@@ -5,10 +5,11 @@ import { ChatGoogleGenerativeAI } from "@langchain/google-genai"
 import { ChatPromptTemplate, MessagesPlaceholder } from "@langchain/core/prompts"
 import { Ollama } from "@langchain/ollama"
 import { ChatOpenAI } from "@langchain/openai"
+import { ChatGroq } from "@langchain/groq"
 import { StringOutputParser } from "@langchain/core/output_parsers";
 import { AIProvider } from "../../logseq/types/settings"
-import { tavilyTool } from "../tools/tavily"
-import { cheerioTool } from "../tools/cheerio"
+import { tavilyTool, tavilyToolGroq } from "../tools/tavily"
+import { cheerioTool, cheerioToolGroq } from "../tools/cheerio"
 
 const prompt = ChatPromptTemplate.fromMessages([
   [
@@ -72,7 +73,17 @@ const LangChainContextProvider: React.FC<Props> = ({ children }) => {
     return undefined
   }, [settings])
 
-  const selectedModel = useMemo(() => {
+  const chatGroqModel = useMemo(() => {
+    if (settings.chatGroqAPIKey && settings.chatGroqModel) {
+      return new ChatGroq({
+        model: settings.chatGroqModel,
+        apiKey: settings.chatGroqAPIKey,
+      })
+    }
+    return undefined
+  }, [settings])
+
+  const selectedModel = useMemo(() => {  
     switch(settings.provider) {
       case AIProvider.Gemini:
         return geminiModel
@@ -80,8 +91,10 @@ const LangChainContextProvider: React.FC<Props> = ({ children }) => {
         return openAIModel
       case AIProvider.Ollama:
         return ollamaModel
+      case AIProvider.Groq:
+        return chatGroqModel
     }
-  }, [geminiModel, ollamaModel, openAIModel, settings.provider])
+  }, [chatGroqModel, geminiModel, ollamaModel, openAIModel, settings.provider])
 
   const chainWithTools = useMemo(() => {
     let model = undefined
@@ -93,6 +106,12 @@ const LangChainContextProvider: React.FC<Props> = ({ children }) => {
         model = selectedModel.bindTools([
           ...(settings.includeTavilySearch && settings.tavilyAPIKey) ? [tavilyTool] : [],
           cheerioTool
+        ])
+      } else if (settings.provider === AIProvider.Groq) {
+        //@ts-ignore
+        model = selectedModel.bindTools([
+          ...(settings.includeTavilySearch && settings.tavilyAPIKey) ? [tavilyToolGroq] : [],
+          cheerioToolGroq
         ])
       } else {
         //@ts-ignore
