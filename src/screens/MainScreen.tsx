@@ -39,6 +39,8 @@ const MainScreen: React.FC<Props> = () => {
       return settings.openAiModel
     } else if (settings.provider === AIProvider.Ollama) {
       return settings.ollamaModel
+    } else if (settings.provider === AIProvider.Groq) {
+      return settings.chatGroqModel
     }
     return ''
   }, [settings])

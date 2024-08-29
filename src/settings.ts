@@ -1,6 +1,6 @@
 import { SettingSchemaDesc } from '@logseq/libs/dist/LSPlugin'
 import { AIProvider } from './modules/logseq/types/settings'
-import { GeminiAIModelEnum, OllamaEmbeddingModelEnum, OllamaModelEnum, OpenAIModelEnum } from './modules/logseq/types/models'
+import { ChatGroqModelEnum, GeminiAIModelEnum, OllamaEmbeddingModelEnum, OllamaModelEnum, OpenAIModelEnum } from './modules/logseq/types/models'
 
 const settings: SettingSchemaDesc[] = [
   {
@@ -13,6 +13,7 @@ const settings: SettingSchemaDesc[] = [
       AIProvider.Gemini,
       AIProvider.OpenAI,
       AIProvider.Ollama,
+      AIProvider.Groq,
     ]
   },
   {
@@ -130,6 +131,40 @@ const settings: SettingSchemaDesc[] = [
       OllamaEmbeddingModelEnum.nomic_embed_text,
       OllamaEmbeddingModelEnum.all_minilm,
     ],
+  },
+  {
+    key: 'chatGroqSettings',
+    type: 'heading',
+    title: 'ChatGroq Settings',
+    description: 'Settings for GroqCloud provider.',
+    default: '',
+  },
+  {
+    key: 'chatGroqAPIKey',
+    type: 'string',
+    title: 'Groq API Key',
+    description: 'Your Groq API Key (This key will saved locally). https://console.groq.com/keys',
+    default: '',
+  },
+  {
+    key: 'chatGroqModel',
+    type: 'enum',
+    title: 'Groq Model',
+    description: 'Select Groq Model',
+    default: ChatGroqModelEnum.llama3170bversatile,
+    enumChoices: [
+      ChatGroqModelEnum.distilWhisperLargeV3En,
+      ChatGroqModelEnum.gemma29bit,
+      ChatGroqModelEnum.gemma7bit,
+      ChatGroqModelEnum.llama3groq70b8192ToolUsePreview,
+      ChatGroqModelEnum.llama3groq8b8192ToolUsePreview,
+      ChatGroqModelEnum.llama3170bversatile,
+      ChatGroqModelEnum.llama318binstant,
+      ChatGroqModelEnum.llamaGuard38b,
+      ChatGroqModelEnum.llama370b8192,
+      ChatGroqModelEnum.llama38b8192,
+      ChatGroqModelEnum.whisperlargev3,
+    ]
   },
   {
     key: 'privacyControl',

@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { devtools, persist, createJSONStorage } from 'zustand/middleware'
 import { AIProvider, LogSeqSettings } from '../types/settings'
-import { GeminiAIModelEnum, OllamaEmbeddingModelEnum, OllamaModelEnum, OpenAIModelEnum } from '../types/models'
+import { ChatGroqModelEnum, GeminiAIModelEnum, OllamaEmbeddingModelEnum, OllamaModelEnum, OpenAIModelEnum } from '../types/models'
 
 interface SettingState {
   settings: LogSeqSettings
@@ -29,6 +29,8 @@ const useSettingsStore = create<SettingState>()(
           ollamaEmbeddingModel: OllamaEmbeddingModelEnum.mxbai_embed_large,
           includeTavilySearch: true,
           tavilyAPIKey: '',
+          chatGroqAPIKey: '',
+          chatGroqModel: ChatGroqModelEnum.llama3170bversatile,
         },
         setSettings: (settings: LogSeqSettings) => set(() => ({ settings })),
       }),

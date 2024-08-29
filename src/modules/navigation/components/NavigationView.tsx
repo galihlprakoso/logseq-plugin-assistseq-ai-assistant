@@ -18,10 +18,8 @@ const NavigationView: React.FC = () => {
   useEffect(() => {
     if (((settings.provider === AIProvider.Gemini && settings.geminiApiKey) || 
         (settings.provider === AIProvider.OpenAI && settings.openAiApiKey) ||
-        (settings.provider === AIProvider.Ollama && settings.ollamaEndpoint)) && (
-          (settings.embeddingProvider === AIProvider.Gemini && settings.geminiApiKey) ||
-          (settings.embeddingProvider === AIProvider.Ollama && settings.ollamaEndpoint)
-        )) {
+        (settings.provider === AIProvider.Ollama && settings.ollamaEndpoint) ||
+        (settings.provider === AIProvider.Groq && settings.chatGroqAPIKey))) {
       setRoute(NavigationRoute.Main)
     } else if(!isAcceptedTermsAndConditions) {
       setRoute(NavigationRoute.TermsAndConditions)

@@ -1,9 +1,10 @@
-import { GeminiAIModelEnum, OpenAIModelEnum } from "./models"
+import { ChatGroqModelEnum, GeminiAIModelEnum, OpenAIModelEnum } from "./models"
 
 export enum AIProvider {
   OpenAI = 'OpenAI',
   Gemini = 'Gemini',
   Ollama = 'Ollama',
+  Groq = 'Groq',
 }
 
 export type LogSeqSettings = {
@@ -23,4 +24,6 @@ export type LogSeqSettings = {
   ollamaEmbeddingModel: string
   includeTavilySearch: boolean
   tavilyAPIKey: string
+  chatGroqAPIKey: string
+  chatGroqModel: ChatGroqModelEnum
 }
