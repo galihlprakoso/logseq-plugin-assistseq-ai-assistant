@@ -14,11 +14,13 @@
 - [Contextual Conversation](https://github.com/galihlprakoso/logseq-plugin-assistseq-ai-assistant?tab=readme-ov-file#contextual-conversation)
 - [Smart Visualization](https://github.com/galihlprakoso/logseq-plugin-assistseq-ai-assistant?tab=readme-ov-file#smart-visualization)
 - [Search Engine (Tavily)](https://github.com/galihlprakoso/logseq-plugin-assistseq-ai-assistant?tab=readme-ov-file#search-engine)
+- [Web Scrapping](https://github.com/galihlprakoso/logseq-plugin-assistseq-ai-assistant?tab=readme-ov-file#web-scrapping)
 
 ## Supported Providers
 - [Gemini](https://gemini.google.com/)
 - [OpenAI](https://openai.com/)
 - [Ollama](https://ollama.com/)
+- [Groq](https://groq.com/)
 
 ## Experience AssistSeq in Action
 <div align="center">
@@ -37,6 +39,9 @@ Turn complexity into clarity. AssistSeq’s AI can visualize concepts to help yo
 
 ### Search Engine
 AssistSeq's AI can surf the internet (powered by [Tavily](https://tavily.com/)) to get any informations that's not provided by current documents.
+
+### Web Scrapping
+Whenever the AssistSeq's AI see url, it will automatically scrape the website and use any informations mentioned on that website as context.
 
 ## What is Logseq?
 Logseq is a privacy-first, open-source knowledge base designed for lifelong learners. Discover more at https://logseq.com.
