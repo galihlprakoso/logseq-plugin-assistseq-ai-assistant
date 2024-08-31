@@ -1,812 +1,339 @@
 export const KROKI_VISUALIZATION_PROMPT = `
 If user ask you to visualize your explanation, or if you think that it's better to include visualization (block diagram, sequence diagram, activity, etc.),
-or if user is explicitely ask for visualization, You could use this plugin's Kroki feature. You could simply write your chat in Kroki's syntax in your markdown response. For example:
-Block diagram:
-\`\`\`kroki-blockdiag
-blockdiag {
-  blockdiag -> generates -> "block-diagrams"
-  blockdiag -> is -> "very easy!"
+or if user is explicitely ask for visualization, You could use this plugin's Kroki feature. You could simply write your chat in Kroki's syntax in your markdown response. For now, it's only support Mermaid diagram. So you could only use the \`kroki-mermaid\`. These are the diagram examples:
 
-  blockdiag [color = "greenyellow"]
-  "block-diagrams" [color = "pink"]
-  "very easy!" [color = "orange"]
-}
+\`\`\`kroki-mermaid
+flowchart TD
+    A[Start] --> B{Is it?}
+    B -- Yes --> C[OK]
+    C --> D[Rethink]
+    D --> B
+    B -- No ----> E[End]
 \`\`\`
 
-Sequence Diagram:
-\`\`\`kroki-seqdiag
-seqdiag {
-  browser  -> webserver [label = "GET /index.html"]
-  browser <-- webserver
-  browser  -> webserver [label = "POST /blog/comment"]
-  webserver  -> database [label = "INSERT comment"]
-  webserver <-- database
-  browser <-- webserver
-}
+\`\`\`kroki-mermaid
+flowchart TB
+    c1-->a2
+    subgraph one
+    a1-->a2
+    end
+    subgraph two
+    b1-->b2
+    end
+    subgraph three
+    c1-->c2
+    end
 \`\`\`
 
-Activity diagram:
-\`\`\`kroki-actdiag
-actdiag {
-  write -> convert -> image
+\`\`\`kroki-mermaid
+flowchart LR
+    subgraph subgraph1
+        direction TB
+        top1[top] --> bottom1[bottom]
+    end
+    subgraph subgraph2
+        direction TB
+        top2[top] --> bottom2[bottom]
+    end
+    %% ^ These subgraphs are identical, except for the links to them:
 
-  lane user {
-    label = "User"
-    write [label = "Writing reST"]
-    image [label = "Get diagram IMAGE"]
-  }
-  lane actdiag {
-    convert [label = "Convert reST to Image"]
-  }
-}
+    %% Link *to* subgraph1: subgraph1 direction is maintained
+    outside --> subgraph1
+    %% Link *within* subgraph2:
+    %% subgraph2 inherits the direction of the top-level graph (LR)
+    outside ---> top2
 \`\`\`
 
-Entity Relationship Diagram:
-\`\`\`kroki-erd
-[Person]
-*name
-height
-weight
-+birth_location_id
-
-[Location]
-*id
-city
-state
-country
-
-Person *--1 Location
-\`\`\`
-
-Mind Map
-\`\`\`kroki-plantuml
-@startmindmap
-skinparam monochrome true
-+ OS
-++ Ubuntu
-+++ Linux Mint
-+++ Kubuntu
-+++ Lubuntu
-+++ KDE Neon
-++ LMDE
-++ SolydXK
-++ SteamOS
-++ Raspbian
--- Windows 95
--- Windows 98
--- Windows NT
---- Windows 8
---- Windows 10
-@endmindmap
-\`\`\`
-
-Mermaid JS Diagram:
 \`\`\`kroki-mermaid
 sequenceDiagram
-    participant Alice
-    participant Bob
-    Alice->John: Hello John, how are you?
-    loop Healthcheck
-        John->John: Fight against hypochondria
+    Alice->>John: Hello John, how are you?
+    John-->>Alice: Great!
+    Alice-)John: See you later!
+\`\`\`
+
+\`\`\`kroki-mermaid
+sequenceDiagram
+    actor Alice
+    actor Bob
+    Alice->>Bob: Hi Bob
+    Bob->>Alice: Hi Alice
+\`\`\`
+
+\`\`\`kroki-mermaid
+sequenceDiagram
+    Alice->>Bob: Hello Bob, how are you ?
+    Bob->>Alice: Fine, thank you. And you?
+    create participant Carl
+    Alice->>Carl: Hi Carl!
+    create actor D as Donald
+    Carl->>D: Hi!
+    destroy Carl
+    Alice-xCarl: We are too many
+    destroy Bob
+    Bob->>Alice: I agree
+\`\`\`
+
+\`\`\`kroki-mermaid
+sequenceDiagram
+    box Purple Alice & John
+    participant A
+    participant J
     end
-    Note right of John: Rational thoughts prevail...
-    John-->Alice: Great!
-    John->Bob: How about you?
-    Bob-->John: Jolly good!
+    box Another Group
+    participant B
+    participant C
+    end
+    A->>J: Hello John, how are you?
+    J->>A: Great!
+    A->>B: Hello Bob, how is Charley?
+    B->>C: Hello Charley, how are you?
 \`\`\`
 
-Hand-drawn like diagrams (Excalidraw)
-\`\`\`kroki-excalidraw
-{
-  "type": "excalidraw",
-  "version": 2,
-  "source": "https://excalidraw.com",
-  "elements": [
-    {
-      "type": "rectangle",
-      "version": 175,
-      "versionNonce": 279344008,
-      "isDeleted": false,
-      "id": "2ZYh24ed28FJ0yE-S3YNY",
-      "fillStyle": "hachure",
-      "strokeWidth": 1,
-      "strokeStyle": "solid",
-      "roughness": 1,
-      "opacity": 100,
-      "angle": 0,
-      "x": 580,
-      "y": 140,
-      "strokeColor": "#000000",
-      "backgroundColor": "#15aabf",
-      "width": 80,
-      "height": 19.999999999999996,
-      "seed": 521916552,
-      "groupIds": [],
-      "strokeSharpness": "sharp",
-      "boundElementIds": [
-        "Be1y2yzhV3Zd4nwCro__8"
-      ]
-    },
-    {
-      "type": "rectangle",
-      "version": 180,
-      "versionNonce": 164784376,
-      "isDeleted": false,
-      "id": "bO0OVt6m7LowYpq22ePCA",
-      "fillStyle": "hachure",
-      "strokeWidth": 1,
-      "strokeStyle": "solid",
-      "roughness": 1,
-      "opacity": 100,
-      "angle": 0,
-      "x": 660,
-      "y": 140,
-      "strokeColor": "#000000",
-      "backgroundColor": "#4c6ef5",
-      "width": 120,
-      "height": 19.999999999999996,
-      "seed": 1303206904,
-      "groupIds": [],
-      "strokeSharpness": "sharp",
-      "boundElementIds": [
-        "KaCO9-QjUenSyCuuanoTo"
-      ]
-    },
-    {
-      "type": "rectangle",
-      "version": 183,
-      "versionNonce": 27181704,
-      "isDeleted": false,
-      "id": "jz0Huq9-s6pNxDw0RqHcR",
-      "fillStyle": "hachure",
-      "strokeWidth": 1,
-      "strokeStyle": "solid",
-      "roughness": 1,
-      "opacity": 100,
-      "angle": 0,
-      "x": 780,
-      "y": 140,
-      "strokeColor": "#000000",
-      "backgroundColor": "#fab005",
-      "width": 180,
-      "height": 19.999999999999996,
-      "seed": 861962120,
-      "groupIds": [],
-      "strokeSharpness": "sharp",
-      "boundElementIds": [
-        "74ifmqmu0vN0NK0_0FwPm"
-      ]
-    },
-    {
-      "type": "rectangle",
-      "version": 192,
-      "versionNonce": 2123008504,
-      "isDeleted": false,
-      "id": "UnmNTmwJtm6moubcGtSgB",
-      "fillStyle": "hachure",
-      "strokeWidth": 1,
-      "strokeStyle": "solid",
-      "roughness": 1,
-      "opacity": 100,
-      "angle": 0,
-      "x": 960,
-      "y": 140,
-      "strokeColor": "#000000",
-      "backgroundColor": "#fa5252",
-      "width": 80,
-      "height": 19.999999999999996,
-      "seed": 277814520,
-      "groupIds": [],
-      "strokeSharpness": "sharp",
-      "boundElementIds": [
-        "1v60NED2criGG-wo9-oQL"
-      ]
-    },
-    {
-      "type": "rectangle",
-      "version": 202,
-      "versionNonce": 1823814024,
-      "isDeleted": false,
-      "id": "of76J4WOJHnHi0L61Vst_",
-      "fillStyle": "hachure",
-      "strokeWidth": 1,
-      "strokeStyle": "solid",
-      "roughness": 1,
-      "opacity": 100,
-      "angle": 0,
-      "x": 1040,
-      "y": 140,
-      "strokeColor": "#000000",
-      "backgroundColor": "#be4bdb",
-      "width": 180,
-      "height": 19.999999999999996,
-      "seed": 1496796808,
-      "groupIds": [],
-      "strokeSharpness": "sharp",
-      "boundElementIds": [
-        "jjuPzyRneMv3f65lps_6a"
-      ]
-    },
-    {
-      "type": "rectangle",
-      "version": 193,
-      "versionNonce": 1234602744,
-      "isDeleted": false,
-      "id": "SlvbjeV-9lXbcrlKib-hj",
-      "fillStyle": "hachure",
-      "strokeWidth": 1,
-      "strokeStyle": "solid",
-      "roughness": 1,
-      "opacity": 100,
-      "angle": 0,
-      "x": 1220,
-      "y": 140,
-      "strokeColor": "#000000",
-      "backgroundColor": "#868e96",
-      "width": 60,
-      "height": 19.999999999999996,
-      "seed": 1938865656,
-      "groupIds": [],
-      "strokeSharpness": "sharp",
-      "boundElementIds": [
-        "5QQzhw_uqk_rBaW2wMriT"
-      ]
-    },
-    {
-      "type": "text",
-      "version": 81,
-      "versionNonce": 1188901129,
-      "isDeleted": false,
-      "id": "vrdt3JfbD2Xwz4K4TWScI",
-      "fillStyle": "hachure",
-      "strokeWidth": 1,
-      "strokeStyle": "solid",
-      "roughness": 1,
-      "opacity": 100,
-      "angle": 0,
-      "x": 840,
-      "y": -60,
-      "strokeColor": "#000000",
-      "backgroundColor": "#868e96",
-      "width": 190,
-      "height": 45,
-      "seed": 1499217288,
-      "groupIds": [],
-      "strokeSharpness": "sharp",
-      "boundElementIds": [],
-      "fontSize": 36,
-      "fontFamily": 1,
-      "text": "JavaScript",
-      "baseline": 32,
-      "textAlign": "left",
-      "verticalAlign": "top"
-    },
-    {
-      "type": "arrow",
-      "version": 343,
-      "versionNonce": 1369065096,
-      "isDeleted": false,
-      "id": "Be1y2yzhV3Zd4nwCro__8",
-      "fillStyle": "hachure",
-      "strokeWidth": 1,
-      "strokeStyle": "solid",
-      "roughness": 1,
-      "opacity": 100,
-      "angle": 0,
-      "x": 597.5075333823274,
-      "y": 299,
-      "strokeColor": "#000000",
-      "backgroundColor": "#868e96",
-      "width": 40,
-      "height": 139,
-      "seed": 666255096,
-      "groupIds": [],
-      "strokeSharpness": "round",
-      "boundElementIds": [],
-      "startBinding": {
-        "focus": -0.41953339688473495,
-        "gap": 1,
-        "elementId": "UxgtvUBaIPnDWJZ9kUQH8"
-      },
-      "endBinding": {
-        "focus": -0.11111111111111113,
-        "gap": 1,
-        "elementId": "2ZYh24ed28FJ0yE-S3YNY"
-      },
-      "points": [
-        [
-          0,
-          0
-        ],
-        [
-          -17.507533382327438,
-          -59
-        ],
-        [
-          22.492466617672562,
-          -139
-        ]
-      ],
-      "lastCommittedPoint": null,
-      "startArrowhead": null,
-      "endArrowhead": "arrow"
-    },
-    {
-      "type": "text",
-      "version": 81,
-      "versionNonce": 690339976,
-      "isDeleted": false,
-      "id": "UxgtvUBaIPnDWJZ9kUQH8",
-      "fillStyle": "hachure",
-      "strokeWidth": 1,
-      "strokeStyle": "solid",
-      "roughness": 1,
-      "opacity": 100,
-      "angle": 0,
-      "x": 580,
-      "y": 300,
-      "strokeColor": "#000000",
-      "backgroundColor": "#868e96",
-      "width": 94,
-      "height": 45,
-      "seed": 84626568,
-      "groupIds": [],
-      "strokeSharpness": "sharp",
-      "boundElementIds": [
-        "Be1y2yzhV3Zd4nwCro__8"
-      ],
-      "fontSize": 36,
-      "fontFamily": 1,
-      "text": "Fetch",
-      "baseline": 32,
-      "textAlign": "left",
-      "verticalAlign": "top"
-    },
-    {
-      "type": "rectangle",
-      "version": 60,
-      "versionNonce": 897215480,
-      "isDeleted": false,
-      "id": "-Lq0agjWQ31TR_Av5Z4HW",
-      "fillStyle": "hachure",
-      "strokeWidth": 1,
-      "strokeStyle": "solid",
-      "roughness": 1,
-      "opacity": 100,
-      "angle": 0,
-      "x": 520,
-      "y": -60,
-      "strokeColor": "#000000",
-      "backgroundColor": "transparent",
-      "width": 820,
-      "height": 540,
-      "seed": 495165432,
-      "groupIds": [],
-      "strokeSharpness": "sharp",
-      "boundElementIds": [
-        "jjuPzyRneMv3f65lps_6a"
-      ]
-    },
-    {
-      "type": "arrow",
-      "version": 537,
-      "versionNonce": 1626949112,
-      "isDeleted": false,
-      "id": "KaCO9-QjUenSyCuuanoTo",
-      "fillStyle": "hachure",
-      "strokeWidth": 1,
-      "strokeStyle": "solid",
-      "roughness": 1,
-      "opacity": 100,
-      "angle": 0,
-      "x": 721.0588599991052,
-      "y": 60.17790458606555,
-      "strokeColor": "#000000",
-      "backgroundColor": "#868e96",
-      "width": 1.0588599991051524,
-      "height": 79.82209541393445,
-      "seed": 637565832,
-      "groupIds": [],
-      "strokeSharpness": "round",
-      "boundElementIds": [],
-      "startBinding": null,
-      "endBinding": {
-        "focus": 0,
-        "gap": 1,
-        "elementId": "bO0OVt6m7LowYpq22ePCA"
-      },
-      "points": [
-        [
-          0,
-          0
-        ],
-        [
-          -1.0588599991051524,
-          39.82209541393445
-        ],
-        [
-          -1.0588599991051524,
-          79.82209541393445
-        ]
-      ],
-      "lastCommittedPoint": null,
-      "startArrowhead": null,
-      "endArrowhead": "arrow"
-    },
-    {
-      "type": "text",
-      "version": 112,
-      "versionNonce": 358083143,
-      "isDeleted": false,
-      "id": "4hEOdlcwK6AHyVhjc-MXS",
-      "fillStyle": "hachure",
-      "strokeWidth": 1,
-      "strokeStyle": "solid",
-      "roughness": 1,
-      "opacity": 100,
-      "angle": 0,
-      "x": 660,
-      "y": 20,
-      "strokeColor": "#000000",
-      "backgroundColor": "#868e96",
-      "width": 103,
-      "height": 45,
-      "seed": 352116984,
-      "groupIds": [],
-      "strokeSharpness": "sharp",
-      "boundElementIds": [],
-      "fontSize": 36,
-      "fontFamily": 1,
-      "text": "Parse",
-      "baseline": 32,
-      "textAlign": "left",
-      "verticalAlign": "top"
-    },
-    {
-      "type": "arrow",
-      "version": 534,
-      "versionNonce": 983577992,
-      "isDeleted": false,
-      "id": "74ifmqmu0vN0NK0_0FwPm",
-      "fillStyle": "hachure",
-      "strokeWidth": 1,
-      "strokeStyle": "solid",
-      "roughness": 1,
-      "opacity": 100,
-      "angle": 0,
-      "x": 841.6574209245741,
-      "y": 219,
-      "strokeColor": "#000000",
-      "backgroundColor": "#868e96",
-      "width": 43.15128973100309,
-      "height": 59.174989629909305,
-      "seed": 1853344392,
-      "groupIds": [],
-      "strokeSharpness": "round",
-      "boundElementIds": [],
-      "startBinding": {
-        "focus": 0.09211398277003865,
-        "gap": 1,
-        "elementId": "K4so-arfr0JX0NJx8vd7T"
-      },
-      "endBinding": {
-        "focus": -0.2163077865936296,
-        "gap": 1,
-        "elementId": "jz0Huq9-s6pNxDw0RqHcR"
-      },
-      "points": [
-        [
-          0,
-          0
-        ],
-        [
-          -1.6574209245741258,
-          1
-        ],
-        [
-          41.493868806428964,
-          -58.174989629909305
-        ]
-      ],
-      "lastCommittedPoint": null,
-      "startArrowhead": null,
-      "endArrowhead": "arrow"
-    },
-    {
-      "type": "text",
-      "version": 118,
-      "versionNonce": 1185705864,
-      "isDeleted": false,
-      "id": "K4so-arfr0JX0NJx8vd7T",
-      "fillStyle": "hachure",
-      "strokeWidth": 1,
-      "strokeStyle": "solid",
-      "roughness": 1,
-      "opacity": 100,
-      "angle": 0,
-      "x": 640,
-      "y": 220,
-      "strokeColor": "#000000",
-      "backgroundColor": "#868e96",
-      "width": 366,
-      "height": 45,
-      "seed": 765854200,
-      "groupIds": [],
-      "strokeSharpness": "sharp",
-      "boundElementIds": [
-        "74ifmqmu0vN0NK0_0FwPm"
-      ],
-      "fontSize": 36,
-      "fontFamily": 1,
-      "text": "Compile and Optimize",
-      "baseline": 32,
-      "textAlign": "left",
-      "verticalAlign": "top"
-    },
-    {
-      "type": "arrow",
-      "version": 791,
-      "versionNonce": 1724761848,
-      "isDeleted": false,
-      "id": "1v60NED2criGG-wo9-oQL",
-      "fillStyle": "hachure",
-      "strokeWidth": 1,
-      "strokeStyle": "solid",
-      "roughness": 1,
-      "opacity": 100,
-      "angle": 0,
-      "x": 960,
-      "y": 320,
-      "strokeColor": "#000000",
-      "backgroundColor": "#868e96",
-      "width": 80,
-      "height": 160,
-      "seed": 1764571528,
-      "groupIds": [],
-      "strokeSharpness": "round",
-      "boundElementIds": [],
-      "startBinding": {
-        "focus": -0.1637630662020906,
-        "gap": 1,
-        "elementId": "dviXudWNxiHYQMZfqHWsH"
-      },
-      "endBinding": {
-        "focus": 0.07692307692307691,
-        "gap": 1,
-        "elementId": "UnmNTmwJtm6moubcGtSgB"
-      },
-      "points": [
-        [
-          0,
-          0
-        ],
-        [
-          80,
-          -40
-        ],
-        [
-          40,
-          -160
-        ]
-      ],
-      "lastCommittedPoint": null,
-      "startArrowhead": null,
-      "endArrowhead": "arrow"
-    },
-    {
-      "type": "text",
-      "version": 194,
-      "versionNonce": 473574648,
-      "isDeleted": false,
-      "id": "dviXudWNxiHYQMZfqHWsH",
-      "fillStyle": "hachure",
-      "strokeWidth": 1,
-      "strokeStyle": "solid",
-      "roughness": 1,
-      "opacity": 100,
-      "angle": 0,
-      "x": 720,
-      "y": 320,
-      "strokeColor": "#000000",
-      "backgroundColor": "#868e96",
-      "width": 484,
-      "height": 45,
-      "seed": 1988297464,
-      "groupIds": [],
-      "strokeSharpness": "sharp",
-      "boundElementIds": [
-        "1v60NED2criGG-wo9-oQL"
-      ],
-      "fontSize": 36,
-      "fontFamily": 1,
-      "text": "Re-optimize and Deoptimize",
-      "baseline": 32,
-      "textAlign": "left",
-      "verticalAlign": "top"
-    },
-    {
-      "type": "arrow",
-      "version": 708,
-      "versionNonce": 185615496,
-      "isDeleted": false,
-      "id": "jjuPzyRneMv3f65lps_6a",
-      "fillStyle": "hachure",
-      "strokeWidth": 1,
-      "strokeStyle": "solid",
-      "roughness": 1,
-      "opacity": 100,
-      "angle": 0,
-      "x": 1140,
-      "y": 80,
-      "strokeColor": "#000000",
-      "backgroundColor": "#868e96",
-      "width": 20,
-      "height": 60,
-      "seed": 1767688328,
-      "groupIds": [],
-      "strokeSharpness": "round",
-      "boundElementIds": [],
-      "startBinding": {
-        "focus": -0.3021784319542362,
-        "gap": 14.800415739789742,
-        "elementId": "qhkjvI1VmWZdnKvU5QKZK"
-      },
-      "endBinding": {
-        "focus": 0.15789473684210528,
-        "gap": 1,
-        "elementId": "of76J4WOJHnHi0L61Vst_"
-      },
-      "points": [
-        [
-          0,
-          0
-        ],
-        [
-          -20,
-          20
-        ],
-        [
-          0,
-          60
-        ]
-      ],
-      "lastCommittedPoint": null,
-      "startArrowhead": null,
-      "endArrowhead": "arrow"
-    },
-    {
-      "type": "text",
-      "version": 213,
-      "versionNonce": 2105884296,
-      "isDeleted": false,
-      "id": "qhkjvI1VmWZdnKvU5QKZK",
-      "fillStyle": "hachure",
-      "strokeWidth": 1,
-      "strokeStyle": "solid",
-      "roughness": 1,
-      "opacity": 100,
-      "angle": 0,
-      "x": 1080,
-      "y": 20.19958426021026,
-      "strokeColor": "#000000",
-      "backgroundColor": "#868e96",
-      "width": 139,
-      "height": 45,
-      "seed": 2115494904,
-      "groupIds": [],
-      "strokeSharpness": "sharp",
-      "boundElementIds": [
-        "jjuPzyRneMv3f65lps_6a"
-      ],
-      "fontSize": 36,
-      "fontFamily": 1,
-      "text": "Execute",
-      "baseline": 32,
-      "textAlign": "left",
-      "verticalAlign": "top"
-    },
-    {
-      "type": "arrow",
-      "version": 707,
-      "versionNonce": 543827960,
-      "isDeleted": false,
-      "id": "5QQzhw_uqk_rBaW2wMriT",
-      "fillStyle": "hachure",
-      "strokeWidth": 1,
-      "strokeStyle": "solid",
-      "roughness": 1,
-      "opacity": 100,
-      "angle": 0,
-      "x": 1220,
-      "y": 240,
-      "strokeColor": "#000000",
-      "backgroundColor": "#868e96",
-      "width": 20,
-      "height": 80,
-      "seed": 2059564936,
-      "groupIds": [],
-      "strokeSharpness": "round",
-      "boundElementIds": [],
-      "startBinding": {
-        "focus": 0.7391304347826086,
-        "gap": 2,
-        "elementId": "C6fyzTg2FHAmrRYfC_THm"
-      },
-      "endBinding": {
-        "focus": 0.3333333333333333,
-        "gap": 1,
-        "elementId": "SlvbjeV-9lXbcrlKib-hj"
-      },
-      "points": [
-        [
-          0,
-          0
-        ],
-        [
-          20,
-          -40
-        ],
-        [
-          20,
-          -80
-        ]
-      ],
-      "lastCommittedPoint": null,
-      "startArrowhead": null,
-      "endArrowhead": "arrow"
-    },
-    {
-      "type": "text",
-      "version": 227,
-      "versionNonce": 2002374136,
-      "isDeleted": false,
-      "id": "C6fyzTg2FHAmrRYfC_THm",
-      "fillStyle": "hachure",
-      "strokeWidth": 1,
-      "strokeStyle": "solid",
-      "roughness": 1,
-      "opacity": 100,
-      "angle": 0,
-      "x": 1160,
-      "y": 220,
-      "strokeColor": "#000000",
-      "backgroundColor": "#868e96",
-      "width": 58,
-      "height": 45,
-      "seed": 1651025144,
-      "groupIds": [],
-      "strokeSharpness": "sharp",
-      "boundElementIds": [
-        "5QQzhw_uqk_rBaW2wMriT"
-      ],
-      "fontSize": 36,
-      "fontFamily": 1,
-      "text": "GC",
-      "baseline": 32,
-      "textAlign": "left",
-      "verticalAlign": "top"
+\`\`\`kroki-mermaid
+---
+title: Animal example
+---
+classDiagram
+    note "From Duck till Zebra"
+    Animal <|-- Duck
+    note for Duck "can fly\ncan swim\ncan dive\ncan help in debugging"
+    Animal <|-- Fish
+    Animal <|-- Zebra
+    Animal : +int age
+    Animal : +String gender
+    Animal: +isMammal()
+    Animal: +mate()
+    class Duck{
+        +String beakColor
+        +swim()
+        +quack()
     }
-  ],
-  "appState": {
-    "viewBackgroundColor": "#ffffff",
-    "gridSize": 20
-  }
-}
+    class Fish{
+        -int sizeInFeet
+        -canEat()
+    }
+    class Zebra{
+        +bool is_wild
+        +run()
+    }
 \`\`\`
 
-The only available visualizations are having names: blockdiag, seqdiag, actdiag, erd, plantuml, mermaid, excalidraw. You
-can include the diagram by using this kind of code block:
-Block diagram:
-\`\`\`kroki-blockdiag
-blockdiag {
-  blockdiag -> generates -> "block-diagrams"
-  blockdiag -> is -> "very easy!"
-
-  blockdiag [color = "greenyellow"]
-  "block-diagrams" [color = "pink"]
-  "very easy!" [color = "orange"]
+\`\`\`kroki-mermaid
+classDiagram
+class Square~Shape~{
+    int id
+    List~int~ position
+    setPoints(List~int~ points)
+    getPoints() List~int~
 }
+
+Square : -List~string~ messages
+Square : +setMessages(List~string~ messages)
+Square : +getMessages() List~string~
+Square : +getDistanceMatrix() List~List~int~~
 \`\`\`
 
-You should mention the name of the diagram \`kroki-[the name of the diagram]\`.
+\`\`\`kroki-mermaid
+---
+title: Simple sample
+---
+stateDiagram-v2
+    [*] --> Still
+    Still --> [*]
+
+    Still --> Moving
+    Moving --> Still
+    Moving --> Crash
+    Crash --> [*]
+\`\`\`
+
+\`\`\`kroki-mermaid
+stateDiagram-v2
+    [*] --> First
+    state First {
+        [*] --> second
+        second --> [*]
+    }
+
+    [*] --> NamedComposite
+    NamedComposite: Another Composite
+    state NamedComposite {
+        [*] --> namedSimple
+        namedSimple --> [*]
+        namedSimple: Another simple
+    }
+\`\`\`
+
+\`\`\`kroki-mermaid
+---
+title: Order example
+---
+erDiagram
+    CUSTOMER ||--o{ ORDER : places
+    ORDER ||--|{ LINE-ITEM : contains
+    CUSTOMER }|..|{ DELIVERY-ADDRESS : uses
+\`\`\`
+
+\`\`\`kroki-mermaid
+erDiagram
+    CUSTOMER ||--o{ ORDER : places
+    CUSTOMER {
+        string name
+        string custNumber
+        string sector
+    }
+    ORDER ||--|{ LINE-ITEM : contains
+    ORDER {
+        int orderNumber
+        string deliveryAddress
+    }
+    LINE-ITEM {
+        string productCode
+        int quantity
+        float pricePerUnit
+    }
+\`\`\`
+
+\`\`\`kroki-mermaid
+erDiagram
+    CAR ||--o{ NAMED-DRIVER : allows
+    PERSON ||--o{ NAMED-DRIVER : is
+\`\`\`
+
+\`\`\`kroki-mermaid
+erDiagram
+    CAR ||--o{ NAMED-DRIVER : allows
+    CAR {
+        string registrationNumber
+        string make
+        string model
+    }
+    PERSON ||--o{ NAMED-DRIVER : is
+    PERSON {
+        string firstName
+        string lastName
+        int age
+    }
+\`\`\`
+
+\`\`\`kroki-mermaid
+journey
+    title My working day
+    section Go to work
+      Make tea: 5: Me
+      Go upstairs: 3: Me
+      Do work: 1: Me, Cat
+    section Go home
+      Go downstairs: 5: Me
+      Sit down: 5: Me
+\`\`\`
+
+\`\`\`kroki-mermaid
+pie title Pets adopted by volunteers
+    "Dogs" : 386
+    "Cats" : 85
+    "Rats" : 15
+\`\`\`
+
+\`\`\`kroki-mermaid
+%%{init: {"pie": {"textPosition": 0.5}, "themeVariables": {"pieOuterStrokeWidth": "5px"}} }%%
+pie showData
+    title Key elements in Product X
+    "Calcium" : 42.96
+    "Potassium" : 50.05
+    "Magnesium" : 10.01
+    "Iron" :  5
+\`\`\`
+
+\`\`\`kroki-mermaid
+quadrantChart
+    title Reach and engagement of campaigns
+    x-axis Low Reach --> High Reach
+    y-axis Low Engagement --> High Engagement
+    quadrant-1 We should expand
+    quadrant-2 Need to promote
+    quadrant-3 Re-evaluate
+    quadrant-4 May be improved
+    Campaign A: [0.3, 0.6]
+    Campaign B: [0.45, 0.23]
+    Campaign C: [0.57, 0.69]
+    Campaign D: [0.78, 0.34]
+    Campaign E: [0.40, 0.34]
+    Campaign F: [0.35, 0.78]
+\`\`\`
+
+\`\`\`kroki-mermaid
+mindmap
+  root((mindmap))
+    Origins
+      Long history
+      ::icon(fa fa-book)
+      Popularisation
+        British popular psychology author Tony Buzan
+    Research
+      On effectiveness<br/>and features
+      On Automatic creation
+        Uses
+            Creative techniques
+            Strategic planning
+            Argument mapping
+    Tools
+      Pen and paper
+      Mermaid
+\`\`\`
+
+\`\`\`kroki-mermaid
+mindmap
+Root
+    A
+      B
+      C
+\`\`\`
+
+\`\`\`kroki-mermaid
+gantt
+    title A Gantt Diagram
+    dateFormat YYYY-MM-DD
+    section Section
+        A task          :a1, 2014-01-01, 30d
+        Another task    :after a1, 20d
+    section Another
+        Task in Another :2014-01-12, 12d
+        another task    :24d
+\`\`\`
+
+\`\`\`kroki-mermaid
+gantt
+    dateFormat  YYYY-MM-DD
+    title       Adding GANTT diagram functionality to mermaid
+    excludes    weekends
+    %% (\`excludes\` accepts specific dates in YYYY-MM-DD format, days of the week ("sunday") or "weekends", but not the word "weekdays".)
+
+    section A section
+    Completed task            :done,    des1, 2014-01-06,2014-01-08
+    Active task               :active,  des2, 2014-01-09, 3d
+    Future task               :         des3, after des2, 5d
+    Future task2              :         des4, after des3, 5d
+
+    section Critical tasks
+    Completed task in the critical line :crit, done, 2014-01-06,24h
+    Implement parser and jison          :crit, done, after des1, 2d
+    Create tests for parser             :crit, active, 3d
+    Future task in critical line        :crit, 5d
+    Create tests for renderer           :2d
+    Add to mermaid                      :until isadded
+    Functionality added                 :milestone, isadded, 2014-01-25, 0d
+
+    section Documentation
+    Describe gantt syntax               :active, a1, after des1, 3d
+    Add gantt diagram to demo page      :after a1  , 20h
+    Add another diagram to demo page    :doc1, after a1  , 48h
+
+    section Last section
+    Describe gantt syntax               :after doc1, 3d
+    Add gantt diagram to demo page      :20h
+    Add another diagram to demo page    :48h
+\`\`\`
+
+You should mention the name of the diagram currently, it's only Mermaid diagram. For example: \`kroki-mermaid\`.
 `
