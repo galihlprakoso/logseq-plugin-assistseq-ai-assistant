@@ -1,3 +1,10 @@
+# [2.3.0](https://github.com/galihlprakoso/logseq-plugin-assistseq-ai-assistant/compare/v2.2.0...v2.3.0) (2024-08-31)
+
+
+### Features
+
+* fix kroki diagram visualization prompt ([830da21](https://github.com/galihlprakoso/logseq-plugin-assistseq-ai-assistant/commit/830da21ac320ad69b3412b545df1b9faa00e6750))
+
 # [2.2.0](https://github.com/galihlprakoso/logseq-plugin-assistseq-ai-assistant/compare/v2.1.0...v2.2.0) (2024-08-29)
 
 
