@@ -1,7 +1,41 @@
 export const KROKI_VISUALIZATION_PROMPT = `
 If user ask you to visualize your explanation, or if you think that it's better to include visualization (block diagram, sequence diagram, activity, etc.),
-or if user is explicitely ask for visualization, You could use this plugin's Kroki feature. You could simply write your chat in Kroki's syntax in your markdown response. For now, it's only support Mermaid diagram. So you could only use the \`kroki-mermaid\`. These are the diagram examples:
+or if user is explicitely ask for visualization, You could use this plugin's Kroki feature. You could simply write your chat in Kroki's syntax in your markdown response. For now, it's only support Mermaid diagram. So you could only use the \`kroki-mermaid\`. 
 
+Syntax Structure
+One would notice that all Diagrams definitions begin with a declaration of the diagram type, followed by the definitions of the diagram and its contents. This declaration notifies the parser which kind of diagram the code is supposed to generate.
+
+Diagram Breaking
+One should beware the use of some words or symbols that can break diagrams. These words or symbols are few and often only affect specific types of diagrams. The table below will continuously be updated.
+
+## Diagram Breaking
+
+One should **beware the use of some words or symbols** that can break diagrams. These words or symbols are few and often only affect specific types of diagrams. The table below will continuously be updated.
+
+| Diagram Breakers                                                                     | Reason                                                                  | Solution                                          |
+| ------------------------------------------------------------------------------------ | ----------------------------------------------------------------------- | ------------------------------------------------- |
+| **Comments**                                                                         |                                                                         |                                                   |
+| [\`%%{\`\`}%%\`](https://github.com/mermaid-js/mermaid/issues/1968)                  | Similar to [Directives](../config/directives.md) confuses the renderer. | In comments using \`%%\`, avoid using "{}".       |
+| **Flow-Charts**                                                                      |                                                                         |                                                   |
+| 'end'                                                                                | The word "End" can cause Flowcharts and Sequence diagrams to break      | Wrap them in quotation marks to prevent breakage. |
+| [Nodes inside Nodes](../syntax/flowchart.md?id=special-characters-that-break-syntax) | Mermaid gets confused with nested shapes                                | wrap them in quotation marks to prevent breaking  |
+| [[ page title ]]                                                                     | This LogSeq page syntax page title is breaking the mermaid syntax.      | Don't include page syntax "[[page title]]" -> "page title"  |
+
+Example : The code below is for an Entity Relationship Diagram, specified by the erDiagram declaration. What follows is the definition of the different Entities represented in it.
+
+\`\`\`kroki-mermaid
+erDiagram
+    CUSTOMER }|..|{ DELIVERY-ADDRESS : has
+    CUSTOMER ||--o{ ORDER : places
+    CUSTOMER ||--o{ INVOICE : "liable for"
+    DELIVERY-ADDRESS ||--o{ ORDER : receives
+    INVOICE ||--|{ ORDER : covers
+    ORDER ||--|{ ORDER-ITEM : includes
+    PRODUCT-CATEGORY ||--|{ PRODUCT : contains
+    PRODUCT ||--o{ ORDER-ITEM : "ordered in"
+\`\`\`
+
+These are the diagram examples:
 \`\`\`kroki-mermaid
 flowchart TD
     A[Start] --> B{Is it?}

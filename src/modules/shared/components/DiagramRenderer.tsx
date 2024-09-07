@@ -8,6 +8,10 @@ type Props = {
   className?: string
 }
 
+function cleanUpSyntax(text: string) {
+  return text.replace(/\[\[|\]\]/g, '')
+}
+
 function textEncode(str: string) {
   if (window.TextEncoder) {
     return new TextEncoder().encode(str)
@@ -37,7 +41,7 @@ const DiagramRenderer: React.FC<Props> = ({ diagram, provider, className }) => {
   const [loading, setLoading] = useState(true)
 
   const url = useMemo(() => {
-    if (diagram && provider) return `https://kroki.io/${provider}/svg/${encodeDiagram(diagram)}`
+    if (diagram && provider) return `https://kroki.io/${provider}/svg/${encodeDiagram(cleanUpSyntax(diagram))}`
 
     return null
   }, [diagram, provider])
