@@ -1,3 +1,10 @@
+# [2.4.0](https://github.com/galihlprakoso/logseq-plugin-assistseq-ai-assistant/compare/v2.3.1...v2.4.0) (2024-09-13)
+
+
+### Features
+
+* added LogSeq page reference linking Issue: [#6](https://github.com/galihlprakoso/logseq-plugin-assistseq-ai-assistant/issues/6) ([12d80b1](https://github.com/galihlprakoso/logseq-plugin-assistseq-ai-assistant/commit/12d80b1f9cb2edfbe62d9699bbe15edd8149ff7e))
+
 ## [2.3.1](https://github.com/galihlprakoso/logseq-plugin-assistseq-ai-assistant/compare/v2.3.0...v2.3.1) (2024-09-09)
 
 
