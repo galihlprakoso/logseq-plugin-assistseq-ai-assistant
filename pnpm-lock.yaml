@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@google/generative-ai':
+        specifier: ^0.17.1
+        version: 0.17.1
       '@langchain/core':
         specifier: ^0.2.28
         version: 0.2.28(langchain@0.2.17(@langchain/google-genai@0.0.26)(@langchain/groq@0.0.17)(@langchain/ollama@0.0.4)(cheerio@1.0.0)(ignore@5.2.0)(openai@4.56.0(zod@3.23.8)))(openai@4.56.0(zod@3.23.8))
@@ -437,6 +440,10 @@ packages:
 
   '@floating-ui/utils@0.2.7':
     resolution: {integrity: sha512-X8R8Oj771YRl/w+c1HqAC1szL8zWQRwFvgDwT129k9ACdBoud/+/rX9V0qiMl6LWUdP9voC2nDVZYPMQQsb6eA==}
+
+  '@google/generative-ai@0.17.1':
+    resolution: {integrity: sha512-TgWz02c5l2XJlEDys81UVat5+Qg9xqmYah7tQt6xlsBwFvzIFPz64aZFGd1av2sxT22NsssqLATjNsusAIJICA==}
+    engines: {node: '>=18.0.0'}
 
   '@google/generative-ai@0.7.1':
     resolution: {integrity: sha512-WTjMLLYL/xfA5BW6xAycRPiAX7FNHKAxrid/ayqC1QMam0KAK0NbMeS9Lubw80gVg5xFMLE+H7pw4wdNzTOlxw==}
@@ -3891,6 +3898,8 @@ snapshots:
       tabbable: 6.2.0
 
   '@floating-ui/utils@0.2.7': {}
+
+  '@google/generative-ai@0.17.1': {}
 
   '@google/generative-ai@0.7.1': {}
 

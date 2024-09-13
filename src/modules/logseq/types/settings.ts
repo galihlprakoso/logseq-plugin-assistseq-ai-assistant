@@ -26,4 +26,6 @@ export type LogSeqSettings = {
   tavilyAPIKey: string
   chatGroqAPIKey: string
   chatGroqModel: ChatGroqModelEnum
+  maxEmbeddedDocuments: number
+  includeURLScrapper: boolean
 }

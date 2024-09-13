@@ -31,6 +31,8 @@ const useSettingsStore = create<SettingState>()(
           tavilyAPIKey: '',
           chatGroqAPIKey: '',
           chatGroqModel: ChatGroqModelEnum.llama3170bversatile,
+          maxEmbeddedDocuments: 10,
+          includeURLScrapper: false,
         },
         setSettings: (settings: LogSeqSettings) => set(() => ({ settings })),
       }),

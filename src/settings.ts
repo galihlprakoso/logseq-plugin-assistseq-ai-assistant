@@ -201,13 +201,27 @@ const settings: SettingSchemaDesc[] = [
     type: 'number',
     title: 'Document Relational Depth',
     description: 'How deep is the documents related to the current document will be included.',
-    default: 5,
+    default: 3,
+  },
+  {
+    key: 'maxEmbeddedDocuments',
+    type: 'number',
+    title: 'Maximum Embedded Documents',
+    description: 'Maximum number of documents to be embedded to each prompt.',
+    default: 10,
   },
   {
     key: 'includeVisualization',
     type: 'boolean',
     title: 'Include Visualization?',
     description: 'Do you want to include visualization? (AI can draw visualization for you using charts and diagrams)',
+    default: true,
+  },
+  {
+    key: 'includeURLScrapper',
+    type: 'boolean',
+    title: 'Include Visualization?',
+    description: 'URL Scrapper is getting rejected by Gemini Provider. Please disable this when using Gemini Provider.',
     default: true,
   },
   {

@@ -44,7 +44,7 @@ const LI: React.FC<React.HTMLProps<HTMLLIElement>> =
   )
 const A: React.FC<React.HTMLProps<HTMLAnchorElement>> =
   ({children, ...props}) => (
-    <a {...props}>
+    <a {...props} onClick={() => window.logseq.hideMainUI()}>
       {children}
     </a>
   )

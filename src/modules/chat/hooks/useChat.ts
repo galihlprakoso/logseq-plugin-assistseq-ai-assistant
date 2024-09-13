@@ -8,15 +8,15 @@ import { ChatMessageRoleEnum } from "../types/chat"
 import useControlUI from "../../logseq/hooks/control-ui"
 import useSettingsStore from "../../logseq/stores/useSettingsStore"
 import { KROKI_VISUALIZATION_PROMPT } from "../constants/prompts"
-import { LogSeqRelevantDocumentRetreiver } from "../../langchain/document-retrievers/LogSeqRelatedDocumentRetreiver"
-import { Document } from "@langchain/core/documents"
 import { getTavilyTool, tavilyTool } from "../../langchain/tools/tavily"
 import { tool } from "@langchain/core/tools"
 import { Runnable } from "@langchain/core/runnables"
 import { cheerioTool, getURLContentTool } from "../../langchain/tools/cheerio"
+import { DocumentInterface } from "@langchain/core/documents"
+import { getLogSeqDocumentsSearchTool, logSeqDocumentSearchTool } from "../../langchain/tools/logseq-documents-search"
+import useGetCurrentGraph from "../../logseq/services/get-current-graph"
 
-
-const formatDocumentsAsString = (documents: Document[]) => {
+const formatDocumentsAsString = (documents: DocumentInterface<Record<string, any>>[]) => {
   const result = documents.map((document) => `Title:${document.metadata.title}\nContent:${document.pageContent}\n`).join("------------------\n")
   return result
 }
@@ -24,21 +24,10 @@ const formatDocumentsAsString = (documents: Document[]) => {
 const useChat = () => {
   const { settings } = useSettingsStore()
   const { showMessage } = useControlUI()
-  const {chain, chainWithTools} = useLangChain()
+  const {chain, chainWithTools, retrieveRelatedDocuments} = useLangChain()
   const { data: currentPage } = useGetCurrentPage()
+  const { data: currentGraph } = useGetCurrentGraph()
   const { addMessage, addTextToMessage, messages, clearChat } = useChatStore()
-
-
-  const logSeqRelatedDocumentRetreiver = useMemo(() => {
-    if (currentPage) {
-      return new LogSeqRelevantDocumentRetreiver({
-        metadata: {
-          pageName: currentPage.name,
-          settings,
-        }
-      })
-    }
-  }, [currentPage, settings])
 
   const toolsByName = useMemo<Record<string, Runnable>>(() => {
     return {
@@ -49,20 +38,27 @@ const useChat = () => {
       [cheerioTool.name]: tool(
         getURLContentTool,
         cheerioTool,
-      )
+      ),
+      [logSeqDocumentSearchTool.name]: tool(
+        getLogSeqDocumentsSearchTool,
+        logSeqDocumentSearchTool,
+      ),
     }
   }, [settings.tavilyAPIKey])
   
   const chat = useCallback(async (query: string) => {
-    if (chain && currentPage && logSeqRelatedDocumentRetreiver) {
+    if (chain && currentPage && retrieveRelatedDocuments) {
 
       const pageMessages = messages[currentPage.name] || []
 
       try {
+        const documents = await retrieveRelatedDocuments(query)
+
         addMessage(currentPage.name, {
           id: uuidv4(),
           content: query,
           role: ChatMessageRoleEnum.User,
+          relatedDocuments: [],
         })
 
         const history = pageMessages.map((message) => {
@@ -72,14 +68,13 @@ const useChat = () => {
           return new AIMessage(message.content)
         })
 
-        const documents = await logSeqRelatedDocumentRetreiver.pipe(formatDocumentsAsString).invoke('')        
-
         if (chainWithTools) {
           const aiMessageWithTool = await chainWithTools.invoke({
-            documents,
+            documents: formatDocumentsAsString(documents || []),
             history,
             kroki_visualization_prompt: '',
             query,
+            current_graph_name: currentGraph?.name || '',
           }, {
             configurable: {
               sessionId: currentPage.name,
@@ -104,10 +99,11 @@ const useChat = () => {
         }
 
         const chainStream = await chain.stream({
-          documents,
+          documents: formatDocumentsAsString(documents || []),
           history,
           kroki_visualization_prompt: settings.includeVisualization ? KROKI_VISUALIZATION_PROMPT : ' ',
           query,
+          current_graph_name: currentGraph?.name || '',
         }, {
           configurable: {
             sessionId: currentPage.name,
@@ -124,6 +120,10 @@ const useChat = () => {
               id: messageId,
               content: chunkText,
               role: ChatMessageRoleEnum.AI,
+              relatedDocuments: (documents || []).map((doc) => ({
+                title: doc.metadata.title,
+                content: doc.pageContent,
+              })),
             })
           } else {
             addTextToMessage(currentPage.name, messageId, chunkText)
@@ -134,10 +134,21 @@ const useChat = () => {
       } catch (err) {
         console.error(err)
         showMessage("There is an error when trying to communicate with AI Provider.", "error")
-      }
-      
+      }      
     }
-  }, [addMessage, addTextToMessage, chain, chainWithTools, currentPage, logSeqRelatedDocumentRetreiver, messages, settings.includeVisualization, showMessage, toolsByName])
+  }, [
+    addMessage,
+    addTextToMessage,
+    chain,
+    chainWithTools,
+    currentPage,
+    currentGraph,
+    messages,
+    retrieveRelatedDocuments,
+    settings.includeVisualization,
+    showMessage,
+    toolsByName
+  ])
 
   const clearAllChat = useCallback(() => {
     if (currentPage) {

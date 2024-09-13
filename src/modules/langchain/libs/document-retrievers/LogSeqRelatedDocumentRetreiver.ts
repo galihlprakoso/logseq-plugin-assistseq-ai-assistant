@@ -5,8 +5,8 @@ import {
 import type { CallbackManagerForRetrieverRun } from "@langchain/core/callbacks/manager"
 import { Document } from "@langchain/core/documents"
 import { BlockEntity } from "@logseq/libs/dist/LSPlugin"
-import { LogSeqSettings } from "../../logseq/types/settings"
-import { LogSeqDocument } from "../../logseq/types/logseq"
+import { LogSeqSettings } from "../../../logseq/types/settings"
+import { LogSeqDocument } from "../../../logseq/types/logseq"
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface LogSeqRelevantDocumentRetrieverInput extends BaseRetrieverInput {}
@@ -62,6 +62,7 @@ export class LogSeqRelevantDocumentRetreiver extends BaseRetriever {
     settings: LogSeqSettings
   ): Promise<LogSeqDocument[]> {
     const page = await window.logseq.Editor.getPage(pageName)
+
     if (!page || depth >= settings.maxRecursionDepth) return documents
   
     const { blacklistedPages, blacklistedKeywords } = settings
@@ -70,7 +71,7 @@ export class LogSeqRelevantDocumentRetreiver extends BaseRetriever {
   
     if (
       blacklistedPagesSet.has(page.name) ||
-      Array.from(blacklistedKeywordsSet).some(keyword => page.name.includes(keyword)) ||
+      Array.from(blacklistedKeywordsSet).some((keyword) => page.name.includes(keyword as string)) ||
       (!settings.includeDatePage && !DATE_PAGE_REGEX.test(page.name))
     ) {
       return documents

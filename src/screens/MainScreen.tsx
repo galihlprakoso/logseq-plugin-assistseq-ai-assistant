@@ -11,6 +11,7 @@ import { ChatMessageRoleEnum } from "../modules/chat/types/chat"
 import ChatBubble from "../modules/chat/components/ChatBubble"
 import MarkdownRenderer from "../modules/shared/components/MarkdownRenderer"
 import TextArea from "../modules/shared/components/TextArea"
+// import { getLogSeqDocumentsSearchTool } from "../modules/langchain/tools/logseq-documents-search"
 
 const KEYDOWN_ENTER = "Enter"
 
