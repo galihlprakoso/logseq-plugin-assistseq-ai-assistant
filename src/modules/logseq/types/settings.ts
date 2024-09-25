@@ -12,6 +12,7 @@ export type LogSeqSettings = {
   geminiModel: GeminiAIModelEnum
   openAiApiKey: string
   openAiModel: OpenAIModelEnum
+  openAIBasePath: string
   provider: AIProvider
   blacklistedPages: string
   blacklistedKeywords: string
