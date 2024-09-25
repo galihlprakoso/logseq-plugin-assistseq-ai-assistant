@@ -4,7 +4,7 @@ import useSettingsStore from "../../logseq/stores/useSettingsStore"
 import { ChatGoogleGenerativeAI } from "@langchain/google-genai"
 import { ChatPromptTemplate, MessagesPlaceholder } from "@langchain/core/prompts"
 import { Ollama } from "@langchain/ollama"
-import { ChatOpenAI } from "@langchain/openai"
+import { ChatOpenAI, OpenAI } from "@langchain/openai"
 import { ChatGroq } from "@langchain/groq"
 import { StringOutputParser } from "@langchain/core/output_parsers"
 // import { TaskType } from "@google/generative-ai"
@@ -145,8 +145,9 @@ const LangChainContextProvider: React.FC<Props> = ({ children }) => {
   const openAIModel = useMemo(() => {
     if (settings.openAiApiKey && settings.openAiModel) {
       return new ChatOpenAI({
+        azureOpenAIBasePath: settings.openAIBasePath || undefined,
         apiKey: settings.openAiApiKey,
-        model: settings.openAiModel,    
+        model: settings.openAiModel,
       })
     }
     return undefined

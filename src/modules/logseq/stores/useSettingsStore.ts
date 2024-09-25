@@ -17,6 +17,7 @@ const useSettingsStore = create<SettingState>()(
           geminiModel: GeminiAIModelEnum.Gemini1_5Flash,
           openAiApiKey: '',
           openAiModel: OpenAIModelEnum.GPT3_5Turbo,
+          openAIBasePath: 'https://api.openai.com/v1/',
           provider: AIProvider.Gemini,
           blacklistedPages: 'a,b,c,todo,card,done,later,doing',
           blacklistedKeywords: 'pass,api key,confidential,password',

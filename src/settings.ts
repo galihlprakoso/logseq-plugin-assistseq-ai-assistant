@@ -61,6 +61,13 @@ const settings: SettingSchemaDesc[] = [
     default: '',
   },
   {
+    key: 'openAIBasePath',
+    type: 'string',
+    title: 'OpenAI Base Path',
+    description: 'Your custom OpenAI Base Path. For example: https://api.perplexity.ai/',
+    default: 'https://api.openai.com/v1/',
+  },
+  {
     key: 'openAiApiKey',
     type: 'string',
     title: 'OpenAI API Key',
