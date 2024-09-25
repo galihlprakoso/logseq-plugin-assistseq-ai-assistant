@@ -1,3 +1,11 @@
+# [2.5.0](https://github.com/galihlprakoso/logseq-plugin-assistseq-ai-assistant/compare/v2.4.0...v2.5.0) (2024-09-25)
+
+
+### Features
+
+* added OpenAI custom base path in settings ([aafd394](https://github.com/galihlprakoso/logseq-plugin-assistseq-ai-assistant/commit/aafd394c1690a0eee0ba750eae66f7f29a0ec529))
+* added OpenAI custom base path in settings ([0634130](https://github.com/galihlprakoso/logseq-plugin-assistseq-ai-assistant/commit/0634130f62329365f0c39d42ef69d2859a131168))
+
 # [2.4.0](https://github.com/galihlprakoso/logseq-plugin-assistseq-ai-assistant/compare/v2.3.1...v2.4.0) (2024-09-13)
 
 
