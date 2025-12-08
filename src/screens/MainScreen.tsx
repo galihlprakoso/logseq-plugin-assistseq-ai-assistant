@@ -11,6 +11,7 @@ import { ChatMessage, ChatMessageRoleEnum } from "../modules/chat/types/chat"
 import ChatBubble from "../modules/chat/components/ChatBubble"
 import MarkdownRenderer from "../modules/shared/components/MarkdownRenderer"
 import TextArea from "../modules/shared/components/TextArea"
+import useGetCurrentGraph from "../modules/logseq/services/get-current-graph"
 // import { getLogSeqDocumentsSearchTool } from "../modules/langchain/tools/logseq-documents-search"
 
 const KEYDOWN_ENTER = "Enter"
@@ -23,6 +24,7 @@ const MainScreen: React.FC<Props> = () => {
   const { mutate: appendBlockToPage } = useAppendBlockToPage()
   const { copyToClipboard } = useCopyToClipboard()  
   const { messages, chat, isLoading, clearChat, currentPageName, error, isGenerating, stopGenerating } = useChat()
+  const { data: currentGraph } = useGetCurrentGraph()
   const [query, setQuery] = useState<string>('')
   const bottomChatRef = useRef<HTMLDivElement | null>(null)
 
@@ -67,6 +69,24 @@ const MainScreen: React.FC<Props> = () => {
     appendBlockToPage({text})
     showMessage("Added to your current page!", "success")
   }, [appendBlockToPage, showMessage])
+
+  const onOpenReference = useCallback((pageName: string) => {
+    if (!pageName || typeof window === 'undefined') return
+
+    if ((window as any)?.logseq?.App?.pushState) {
+      window.logseq.App.pushState('page', { name: pageName })
+      return
+    }
+
+    if (window.open) {
+      const encodedGraph = currentGraph?.name ? encodeURIComponent(currentGraph.name) : ''
+      const encodedPage = encodeURIComponent(pageName)
+      const target = currentGraph?.name
+        ? `logseq://graph/${encodedGraph}?page=${encodedPage}`
+        : `logseq://page/${encodedPage}`
+      window.open(target, '_blank')
+    }
+  }, [currentGraph])
 
   if (error && (error as Error)?.message !== 'No page found') {
     const errorMessage = (error as Error)?.message || 'Unknown error'
@@ -129,6 +149,25 @@ const MainScreen: React.FC<Props> = () => {
                 </div> : (
                   <div key={message.id} className="w-full flex flex-col">
                     <MarkdownRenderer  markdown={message.content} />
+
+                    {message.relatedDocuments?.length ? (
+                      <div className="mt-4 rounded-lg border border-dashed border-gray-200 bg-gray-50 p-3 text-xs text-gray-600 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
+                        <p className="text-[10px] font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Referenced Notes</p>
+                        <ol className="mt-2 space-y-1 list-decimal list-inside">
+                          {message.relatedDocuments.map((doc, index) => (
+                            <li key={`${message.id}-ref-${index}`}>
+                              <button
+                                type="button"
+                                className="text-left hover:text-blue-600 dark:hover:text-blue-400"
+                                onClick={() => onOpenReference(doc.title)}
+                              >
+                                {doc.title}
+                              </button>
+                            </li>
+                          ))}
+                        </ol>
+                      </div>
+                    ) : null}
 
                     <hr className="h-px my-2 bg-gray-200 border-0 dark:bg-gray-700"></hr>
 

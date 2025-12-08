@@ -1,16 +1,17 @@
 import React, { ReactNode, useCallback, useMemo } from "react"
 import { Runnable, RunnableConfig, RunnableSequence } from "@langchain/core/runnables"
 import useSettingsStore from "../../logseq/stores/useSettingsStore"
-import { ChatGoogleGenerativeAI } from "@langchain/google-genai"
+import { ChatGoogleGenerativeAI, GoogleGenerativeAIEmbeddings } from "@langchain/google-genai"
 import { ChatPromptTemplate, MessagesPlaceholder } from "@langchain/core/prompts"
-import { Ollama } from "@langchain/ollama"
-import { ChatOpenAI, OpenAI } from "@langchain/openai"
+import { Ollama, OllamaEmbeddings } from "@langchain/ollama"
+import { ChatOpenAI, OpenAIEmbeddings } from "@langchain/openai"
 import { ChatGroq } from "@langchain/groq"
 import { ChatAnthropic } from "@langchain/anthropic"
 import { ChatMistralAI } from "@langchain/mistralai"
 import { StringOutputParser } from "@langchain/core/output_parsers"
 import { DocumentInterface } from "@langchain/core/documents"
 import { AIProvider } from "../../logseq/types/settings"
+import { GeminiAIModelEnum } from "../../logseq/types/models"
 import { tavilyTool, tavilyToolGroq } from "../tools/tavily"
 import { cheerioTool, cheerioToolGroq } from "../tools/cheerio"
 import useGetCurrentPage from "../../logseq/services/get-current-page"
@@ -57,6 +58,28 @@ const buildPromptTemplate = (customSystemPrompt: string) => {
   ])
 }
 
+const cosineSimilarity = (vectorA: number[], vectorB: number[]) => {
+  if (!vectorA.length || !vectorB.length || vectorA.length !== vectorB.length) {
+    return 0
+  }
+
+  let dotProduct = 0
+  let normA = 0
+  let normB = 0
+
+  for (let i = 0; i < vectorA.length; i++) {
+    dotProduct += vectorA[i] * vectorB[i]
+    normA += vectorA[i] * vectorA[i]
+    normB += vectorB[i] * vectorB[i]
+  }
+
+  if (!normA || !normB) {
+    return 0
+  }
+
+  return dotProduct / (Math.sqrt(normA) * Math.sqrt(normB))
+}
+
 type LangChainContext = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   chain?: Runnable<any, string>
@@ -99,55 +122,83 @@ const LangChainContextProvider: React.FC<Props> = ({ children }) => {
     })
   }, [currentPage, settings])
 
-  // const embeddings = useMemo(() => {
-  //   if (settings.embeddingProvider === AIProvider.Gemini && settings.geminiApiKey) {
-  //     return new GoogleGenerativeAIEmbeddings({
-  //       model: GOOGLE_EMBEDDING_MODEL,
-  //       taskType: TaskType.RETRIEVAL_DOCUMENT,
-  //       apiKey: settings.geminiApiKey,
-  //     });
-  //   }
-  //   if (settings.embeddingProvider === AIProvider.Ollama && settings.ollamaEndpoint) {
-  //     return new OllamaEmbeddings({
-  //       model: settings.ollamaEmbeddingModel,
-  //       baseUrl: settings.ollamaEndpoint,
-  //     });
-  //   }
-  //   return null
-  // }, [settings.embeddingProvider, settings.geminiApiKey, settings.ollamaEmbeddingModel, settings.ollamaEndpoint])
+  const embeddings = useMemo(() => {
+    if (settings.embeddingProvider === AIProvider.Gemini && settings.geminiApiKey) {
+      return new GoogleGenerativeAIEmbeddings({
+        apiKey: settings.geminiApiKey,
+        model: GeminiAIModelEnum.TextEmbedding004,
+      })
+    }
+    if (settings.embeddingProvider === AIProvider.Ollama && settings.ollamaEndpoint) {
+      return new OllamaEmbeddings({
+        model: settings.ollamaEmbeddingModel,
+        baseUrl: settings.ollamaEndpoint,
+      })
+    }
+    if (
+      settings.embeddingProvider === AIProvider.OpenRouter &&
+      settings.openRouterAPIKey &&
+      settings.openRouterEmbeddingModel
+    ) {
+      return new OpenAIEmbeddings({
+        model: settings.openRouterEmbeddingModel,
+        apiKey: settings.openRouterAPIKey,
+        configuration: {
+          baseURL: 'https://openrouter.ai/api/v1',
+        },
+      })
+    }
+    return null
+  }, [
+    settings.embeddingProvider,
+    settings.geminiApiKey,
+    settings.ollamaEmbeddingModel,
+    settings.ollamaEndpoint,
+    settings.openRouterAPIKey,
+    settings.openRouterEmbeddingModel,
+  ])
 
   const retrieveRelatedDocuments = useCallback(async (query: string) => {
-    if (logSeqRelatedDocumentRetreiver) {
-      const documents = await logSeqRelatedDocumentRetreiver.invoke(query)      
-
-      // if (embeddings) {
-      //   const cacheBackedEmbeddings = CacheBackedEmbeddings.fromBytesStore(
-      //     embeddings,
-      //     inMemoryStore,
-      //     {
-      //       namespace: embeddings.model,
-      //     }
-      //   );
-
-      //   const vectorstore = await MemoryVectorStore.fromDocuments(
-      //     documents.map(doc => ({ pageContent: doc.pageContent, metadata: doc.metadata})),
-      //     cacheBackedEmbeddings
-      //   );
-      
-      //   const retriever = vectorstore.asRetriever(settings.maxEmbeddedDocuments);
-  
-      //   const retrievedDocuments = await retriever.invoke(query);
-  
-      //   return retrievedDocuments
-      // }
-
-      return documents.map((doc) => ({
-         metadata: doc.metadata,
-         pageContent: doc.pageContent,
-      }))
+    if (!logSeqRelatedDocumentRetreiver) {
+      return null
     }
-    return null;
-  }, [logSeqRelatedDocumentRetreiver])
+
+    const documents = await logSeqRelatedDocumentRetreiver.invoke(query) as DocumentInterface<Record<string, unknown>>[]
+    if (!documents || documents.length === 0) {
+      return []
+    }
+
+    if (embeddings) {
+      try {
+        const [documentEmbeddings, queryEmbedding] = await Promise.all([
+          embeddings.embedDocuments(documents.map((doc) => doc.pageContent)),
+          embeddings.embedQuery(query),
+        ])
+
+        const scoredDocuments = documents.map((doc: DocumentInterface<Record<string, unknown>>, index) => ({
+          doc,
+          score: cosineSimilarity(queryEmbedding, documentEmbeddings[index] || []),
+        }))
+
+        const topDocuments = scoredDocuments
+          .sort((a, b) => b.score - a.score)
+          .slice(0, settings.maxEmbeddedDocuments)
+          .map((item) => item.doc)
+
+        return topDocuments.map((doc) => ({
+          metadata: doc.metadata,
+          pageContent: doc.pageContent,
+        }))
+      } catch (error) {
+        console.error('Failed to embed LogSeq documents', error)
+      }
+    }
+
+    return documents.map((doc) => ({
+      metadata: doc.metadata,
+      pageContent: doc.pageContent,
+    }))
+  }, [embeddings, logSeqRelatedDocumentRetreiver, settings.maxEmbeddedDocuments])
 
   const geminiModel = useMemo(() => {
     if (settings.geminiApiKey && settings.geminiModel) {

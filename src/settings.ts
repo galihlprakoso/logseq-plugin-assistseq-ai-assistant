@@ -28,6 +28,7 @@ const settings: SettingSchemaDesc[] = [
     enumChoices: [
       AIProvider.Gemini,
       AIProvider.Ollama,
+      AIProvider.OpenRouter,
     ]
   },
   {
@@ -203,15 +204,31 @@ const settings: SettingSchemaDesc[] = [
       OpenRouterModelEnum.AnthropicClaudeOpus,
       OpenRouterModelEnum.OpenAIGPT4o,
       OpenRouterModelEnum.OpenAIGPT4oMini,
+      OpenRouterModelEnum.OpenAIGPT51Chat,
       OpenRouterModelEnum.OpenAIO1,
       OpenRouterModelEnum.OpenAIO1Preview,
       OpenRouterModelEnum.OpenAIO1Mini,
+      OpenRouterModelEnum.OpenAIO4Mini,
       OpenRouterModelEnum.GoogleGemini2Flash,
+      OpenRouterModelEnum.GoogleGemini25Flash,
+      OpenRouterModelEnum.GoogleGemini25Pro,
       OpenRouterModelEnum.GoogleGeminiPro,
+      OpenRouterModelEnum.GoogleGemini3ProPreview,
+      OpenRouterModelEnum.GoogleGeminiEmbedding001,
       OpenRouterModelEnum.MetaLlama3_370B,
       OpenRouterModelEnum.MetaLlama3_1405B,
       OpenRouterModelEnum.MistralLarge,
       OpenRouterModelEnum.DeepSeekChat,
+    ]
+  },
+  {
+    key: 'openRouterEmbeddingModel',
+    type: 'enum',
+    title: 'OpenRouter Embedding Model',
+    description: 'Select OpenRouter embedding model',
+    default: OpenRouterModelEnum.GoogleGeminiEmbedding001,
+    enumChoices: [
+      OpenRouterModelEnum.GoogleGeminiEmbedding001,
     ]
   },
   {

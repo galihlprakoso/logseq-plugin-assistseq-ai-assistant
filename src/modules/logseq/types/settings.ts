@@ -37,6 +37,7 @@ export type LogSeqSettings = {
   includeURLScrapper: boolean
   openRouterAPIKey: string
   openRouterModel: OpenRouterModelEnum
+  openRouterEmbeddingModel: OpenRouterModelEnum
   claudeAPIKey: string
   claudeModel: ClaudeModelEnum
   mistralAPIKey: string
