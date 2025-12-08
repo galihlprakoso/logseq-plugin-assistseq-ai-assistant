@@ -11,7 +11,7 @@ import { ChatMistralAI } from "@langchain/mistralai"
 import { StringOutputParser } from "@langchain/core/output_parsers"
 import { DocumentInterface } from "@langchain/core/documents"
 import { AIProvider } from "../../logseq/types/settings"
-import { GeminiAIModelEnum } from "../../logseq/types/models"
+import { GeminiAIModelEnum, OpenRouterModelEnum } from "../../logseq/types/models"
 import { tavilyTool, tavilyToolGroq } from "../tools/tavily"
 import { cheerioTool, cheerioToolGroq } from "../tools/cheerio"
 import useGetCurrentPage from "../../logseq/services/get-current-page"
@@ -80,6 +80,59 @@ const cosineSimilarity = (vectorA: number[], vectorB: number[]) => {
   return dotProduct / (Math.sqrt(normA) * Math.sqrt(normB))
 }
 
+const normalizeContent = (text: string) => text.replace(/\s+/g, " ").trim()
+const MIN_CONTENT_LENGTH = 40
+
+const hasMeaningfulContent = (text: string) => normalizeContent(text).length >= MIN_CONTENT_LENGTH
+
+const extractKeywords = (query: string) => query
+  .toLowerCase()
+  .split(/\W+/)
+  .filter((token) => token.length > 2)
+  .slice(0, 6)
+
+const documentMatchesKeywords = (content: string, keywords: string[]) => {
+  if (!keywords.length) return true
+  const normalized = normalizeContent(content).toLowerCase()
+  return keywords.some((keyword) => normalized.includes(keyword))
+}
+
+const buildSnippet = (content: string, keywords: string[]) => {
+  const normalized = normalizeContent(content)
+  if (!normalized) return ''
+
+  const lower = normalized.toLowerCase()
+  let startIndex = 0
+
+  if (keywords.length) {
+    for (const keyword of keywords) {
+      const matchIndex = lower.indexOf(keyword)
+      if (matchIndex !== -1) {
+        startIndex = Math.max(0, matchIndex - 60)
+        break
+      }
+    }
+  }
+
+  const SNIPPET_LENGTH = 220
+  const snippet = normalized.slice(startIndex, startIndex + SNIPPET_LENGTH)
+  const prefix = startIndex > 0 ? '…' : ''
+  const suffix = startIndex + SNIPPET_LENGTH < normalized.length ? '…' : ''
+
+  return `${prefix}${snippet}${suffix}`.trim()
+}
+
+const dedupeDocumentsByTitle = (docs: DocumentInterface<Record<string, unknown>>[]) => {
+  const seen = new Set<string>()
+  return docs.filter((doc) => {
+    const title = typeof doc.metadata?.title === 'string' ? doc.metadata.title : ''
+    if (!title) return true
+    if (seen.has(title)) return false
+    seen.add(title)
+    return true
+  })
+}
+
 type LangChainContext = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   chain?: Runnable<any, string>
@@ -107,6 +160,8 @@ type Props = {
 const LangChainContextProvider: React.FC<Props> = ({ children }) => {
   const { settings } = useSettingsStore()
   const { data: currentPage } = useGetCurrentPage()
+  const sanitizedOpenRouterModel = settings.openRouterModel?.trim() || OpenRouterModelEnum.OpenAIGPT4oMini
+  const sanitizedOpenRouterEmbeddingModel = settings.openRouterEmbeddingModel?.trim() || OpenRouterModelEnum.GoogleGeminiEmbedding001
 
   const prompt = useMemo(() => {
     return buildPromptTemplate(settings.customSystemPrompt)
@@ -138,10 +193,10 @@ const LangChainContextProvider: React.FC<Props> = ({ children }) => {
     if (
       settings.embeddingProvider === AIProvider.OpenRouter &&
       settings.openRouterAPIKey &&
-      settings.openRouterEmbeddingModel
+      sanitizedOpenRouterEmbeddingModel
     ) {
       return new OpenAIEmbeddings({
-        model: settings.openRouterEmbeddingModel,
+        model: sanitizedOpenRouterEmbeddingModel,
         apiKey: settings.openRouterAPIKey,
         configuration: {
           baseURL: 'https://openrouter.ai/api/v1',
@@ -155,7 +210,7 @@ const LangChainContextProvider: React.FC<Props> = ({ children }) => {
     settings.ollamaEmbeddingModel,
     settings.ollamaEndpoint,
     settings.openRouterAPIKey,
-    settings.openRouterEmbeddingModel,
+    sanitizedOpenRouterEmbeddingModel,
   ])
 
   const retrieveRelatedDocuments = useCallback(async (query: string) => {
@@ -168,36 +223,62 @@ const LangChainContextProvider: React.FC<Props> = ({ children }) => {
       return []
     }
 
+    const keywords = extractKeywords(query)
+
+    const candidatePool = dedupeDocumentsByTitle(
+      (() => {
+        const contentRich = documents.filter((doc) => hasMeaningfulContent(doc.pageContent))
+        const keywordMatched = contentRich.filter((doc) => documentMatchesKeywords(doc.pageContent, keywords))
+
+        if (keywordMatched.length) return keywordMatched
+        if (contentRich.length) return contentRich
+        return documents
+      })()
+    )
+
+    if (!candidatePool.length) {
+      return []
+    }
+
+    const formatDocument = (
+      doc: DocumentInterface<Record<string, unknown>>,
+      score?: number,
+    ): DocumentInterface<Record<string, unknown>> => ({
+      metadata: {
+        ...doc.metadata,
+        snippet: buildSnippet(doc.pageContent, keywords),
+        score,
+      },
+      pageContent: doc.pageContent,
+    })
+
     if (embeddings) {
       try {
         const [documentEmbeddings, queryEmbedding] = await Promise.all([
-          embeddings.embedDocuments(documents.map((doc) => doc.pageContent)),
+          embeddings.embedDocuments(candidatePool.map((doc) => doc.pageContent)),
           embeddings.embedQuery(query),
         ])
 
-        const scoredDocuments = documents.map((doc: DocumentInterface<Record<string, unknown>>, index) => ({
+        const scoredDocuments = candidatePool.map((doc, index) => ({
           doc,
           score: cosineSimilarity(queryEmbedding, documentEmbeddings[index] || []),
         }))
 
-        const topDocuments = scoredDocuments
+        const positiveMatches = scoredDocuments.filter((item) => item.score > 0.05)
+
+        const rankedDocuments = (positiveMatches.length ? positiveMatches : scoredDocuments)
           .sort((a, b) => b.score - a.score)
           .slice(0, settings.maxEmbeddedDocuments)
-          .map((item) => item.doc)
 
-        return topDocuments.map((doc) => ({
-          metadata: doc.metadata,
-          pageContent: doc.pageContent,
-        }))
+        return rankedDocuments.map((item) => formatDocument(item.doc, item.score))
       } catch (error) {
         console.error('Failed to embed LogSeq documents', error)
       }
     }
 
-    return documents.map((doc) => ({
-      metadata: doc.metadata,
-      pageContent: doc.pageContent,
-    }))
+    return candidatePool
+      .slice(0, settings.maxEmbeddedDocuments)
+      .map((doc) => formatDocument(doc))
   }, [embeddings, logSeqRelatedDocumentRetreiver, settings.maxEmbeddedDocuments])
 
   const geminiModel = useMemo(() => {
@@ -245,9 +326,9 @@ const LangChainContextProvider: React.FC<Props> = ({ children }) => {
   }, [settings])
 
   const openRouterModel = useMemo(() => {
-    if (settings.openRouterAPIKey && settings.openRouterModel) {
+    if (settings.openRouterAPIKey && sanitizedOpenRouterModel) {
       return new ChatOpenAI({
-        modelName: settings.openRouterModel,
+        modelName: sanitizedOpenRouterModel,
         apiKey: settings.openRouterAPIKey,
         configuration: {
           baseURL: 'https://openrouter.ai/api/v1',
@@ -255,7 +336,7 @@ const LangChainContextProvider: React.FC<Props> = ({ children }) => {
       })
     }
     return undefined
-  }, [settings])
+  }, [sanitizedOpenRouterModel, settings.openRouterAPIKey])
 
   const claudeModel = useMemo(() => {
     if (settings.claudeAPIKey && settings.claudeModel) {

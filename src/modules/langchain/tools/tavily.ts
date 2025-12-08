@@ -1,5 +1,18 @@
 import { z } from "zod";
 
+export interface TavilySearchResult {
+  title: string;
+  url: string;
+  content: string;
+  score: number;
+}
+
+type TavilySearchParams = {
+  topic?: "general" | "news";
+  days?: number;
+  query: string;
+}
+
 export const schema = z.object({
   topic: z
     .enum(["general", "news"])
@@ -11,30 +24,54 @@ export const schema = z.object({
   query: z.string().describe("The search query you want to execute. (required)"),
 });
 
-export const getTavilyTool = (api_key: string) => async ({ topic, days, query }: {
-  topic?: "general" | "news";
-  days?: number;
-  query: string;
-}) => {
-  const response = await fetch("https://api.tavily.com/search", {
+const TAVILY_ENDPOINT = "https://api.tavily.com/search"
+
+const requestTavilyJson = async (apiKey: string, params: TavilySearchParams) => {
+  const response = await fetch(TAVILY_ENDPOINT, {
     method: 'POST',
     headers: {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      topic,
-      days,
-      query,
-      api_key,
+      topic: params.topic,
+      days: params.days,
+      query: params.query,
+      max_results: 10,
+      api_key: apiKey,
     })
   })
 
-  const responseJson = await response.json()
+  if (!response.ok) {
+    throw new Error(`Tavily API error: ${response.status}`)
+  }
 
-  return (responseJson['results'] || []).map((result: any) => `Title: ${result.title}
+  return response.json()
+}
+
+export const fetchTavilyResults = async (apiKey: string, params: TavilySearchParams): Promise<TavilySearchResult[]> => {
+  const json = await requestTavilyJson(apiKey, params)
+  return (json?.results || []).map((result: any) => ({
+    title: result.title || 'Untitled',
+    url: result.url || '',
+    content: result.content || '',
+    score: typeof result.score === 'number' ? result.score : 0,
+  }))
+}
+
+const formatResultsForTool = (results: TavilySearchResult[]) => {
+  if (!results.length) {
+    return "No search results returned."
+  }
+
+  return results.map((result) => `Title: ${result.title}
 URL: ${result.url}
 Content: ${result.content}
 Score: ${result.score}\n`).join("------------------\n")
+}
+
+export const getTavilyTool = (api_key: string) => async ({ topic, days, query }: TavilySearchParams) => {
+  const results = await fetchTavilyResults(api_key, { topic, days, query })
+  return formatResultsForTool(results)
 }
 
 const NAME = "global_search"

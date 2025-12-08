@@ -19,7 +19,7 @@ const KEYDOWN_ENTER = "Enter"
 type Props = object
 
 const MainScreen: React.FC<Props> = () => {
-  const { settings } = useSettingsStore()
+  const { settings, setSettings } = useSettingsStore()
   const { showMessage } = useControlUI()
   const { mutate: appendBlockToPage } = useAppendBlockToPage()
   const { copyToClipboard } = useCopyToClipboard()  
@@ -69,6 +69,22 @@ const MainScreen: React.FC<Props> = () => {
     appendBlockToPage({text})
     showMessage("Added to your current page!", "success")
   }, [appendBlockToPage, showMessage])
+
+  const hasTavilyKey = Boolean(settings.tavilyAPIKey && settings.tavilyAPIKey.trim() !== '')
+
+  const onToggleSearch = useCallback(() => {
+    if (!hasTavilyKey) {
+      showMessage("请先在设置中填写 Tavily API Key", "warning")
+      return
+    }
+
+    setSettings({
+      ...settings,
+      includeTavilySearch: !settings.includeTavilySearch,
+    })
+
+    showMessage(!settings.includeTavilySearch ? "Tavily Search 已开启" : "Tavily Search 已关闭", "success")
+  }, [hasTavilyKey, setSettings, settings, showMessage])
 
   const onOpenReference = useCallback((pageName: string) => {
     if (!pageName || typeof window === 'undefined') return
@@ -153,7 +169,7 @@ const MainScreen: React.FC<Props> = () => {
                     {message.relatedDocuments?.length ? (
                       <div className="mt-4 rounded-lg border border-dashed border-gray-200 bg-gray-50 p-3 text-xs text-gray-600 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
                         <p className="text-[10px] font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Referenced Notes</p>
-                        <ol className="mt-2 space-y-1 list-decimal list-inside">
+                        <ol className="mt-2 space-y-2 list-decimal list-inside">
                           {message.relatedDocuments.map((doc, index) => (
                             <li key={`${message.id}-ref-${index}`}>
                               <button
@@ -163,6 +179,11 @@ const MainScreen: React.FC<Props> = () => {
                               >
                                 {doc.title}
                               </button>
+                              {doc.snippet ? (
+                                <p className="mt-0.5 text-[11px] leading-relaxed text-gray-500 dark:text-gray-400">
+                                  {doc.snippet}
+                                </p>
+                              ) : null}
                             </li>
                           ))}
                         </ol>
@@ -221,7 +242,20 @@ const MainScreen: React.FC<Props> = () => {
               value={query}
             />
             <div className="flex flex-row items-centers justify-between mt-1">
-              <span className="text-xs text-gray-500">{settings.provider} - {providerModel} &#x2022; {currentPageName || '🌍 Global Mode'}</span>
+              <div className="flex items-center gap-2 text-xs text-gray-500">
+                <span>{settings.provider} - {providerModel} &#x2022; {currentPageName || '🌍 Global Mode'}</span>
+                <button
+                  type="button"
+                  onClick={onToggleSearch}
+                  disabled={!hasTavilyKey}
+                  className={`inline-flex items-center rounded border px-2 py-0.5 text-[11px] transition-colors ${settings.includeTavilySearch ? 'border-green-500 text-green-600' : 'border-gray-400 text-gray-500'} ${hasTavilyKey ? 'hover:bg-gray-100 dark:hover:bg-gray-800' : 'opacity-50 cursor-not-allowed'}`}
+                >
+                  <svg className="mr-1 h-3.5 w-3.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m21 21-4.35-4.35M6.5 11a4.5 4.5 0 1 1 9 0 4.5 4.5 0 0 1-9 0Z" />
+                  </svg>
+                  {settings.includeTavilySearch ? 'Search On' : 'Search Off'}
+                </button>
+              </div>
 
               <span
                 className="text-xs text-gray-500 underline cursor-pointer"

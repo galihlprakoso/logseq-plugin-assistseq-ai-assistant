@@ -6,6 +6,12 @@
 * allow selecting OpenRouter as embedding provider and choosing its embedding model
 * extend OpenRouter model list with GPT-5.1 Chat, O4 Mini, and Gemini 2.5 Flash/Pro
 * embed referenced Logseq notes with the selected provider and surface citations in chat answers
+* allow entering any OpenRouter model slug instead of picking from a fixed list
+* allow free-form OpenRouter embedding model selection
+* sanitize OpenRouter model inputs to avoid empty-model API errors
+* filter citation list to only include meaningful notes and show inline snippets
+* add in-app Tavily search toggle button and cap default search results at 10
+* detect "web search" commands and run Tavily directly to avoid provider errors
 
 # [2.8.0](https://github.com/galihlprakoso/logseq-plugin-assistseq-ai-assistant/compare/v2.7.0...v2.8.0) (2025-11-08)
 
