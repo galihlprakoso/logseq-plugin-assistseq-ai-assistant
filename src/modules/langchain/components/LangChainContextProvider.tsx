@@ -1,16 +1,17 @@
 import React, { ReactNode, useCallback, useMemo } from "react"
 import { Runnable, RunnableConfig, RunnableSequence } from "@langchain/core/runnables"
 import useSettingsStore from "../../logseq/stores/useSettingsStore"
-import { ChatGoogleGenerativeAI } from "@langchain/google-genai"
+import { ChatGoogleGenerativeAI, GoogleGenerativeAIEmbeddings } from "@langchain/google-genai"
 import { ChatPromptTemplate, MessagesPlaceholder } from "@langchain/core/prompts"
-import { Ollama } from "@langchain/ollama"
-import { ChatOpenAI, OpenAI } from "@langchain/openai"
+import { Ollama, OllamaEmbeddings } from "@langchain/ollama"
+import { ChatOpenAI, OpenAIEmbeddings } from "@langchain/openai"
 import { ChatGroq } from "@langchain/groq"
 import { ChatAnthropic } from "@langchain/anthropic"
 import { ChatMistralAI } from "@langchain/mistralai"
 import { StringOutputParser } from "@langchain/core/output_parsers"
 import { DocumentInterface } from "@langchain/core/documents"
 import { AIProvider } from "../../logseq/types/settings"
+import { GeminiAIModelEnum, OpenRouterModelEnum } from "../../logseq/types/models"
 import { tavilyTool, tavilyToolGroq } from "../tools/tavily"
 import { cheerioTool, cheerioToolGroq } from "../tools/cheerio"
 import useGetCurrentPage from "../../logseq/services/get-current-page"
@@ -57,6 +58,81 @@ const buildPromptTemplate = (customSystemPrompt: string) => {
   ])
 }
 
+const cosineSimilarity = (vectorA: number[], vectorB: number[]) => {
+  if (!vectorA.length || !vectorB.length || vectorA.length !== vectorB.length) {
+    return 0
+  }
+
+  let dotProduct = 0
+  let normA = 0
+  let normB = 0
+
+  for (let i = 0; i < vectorA.length; i++) {
+    dotProduct += vectorA[i] * vectorB[i]
+    normA += vectorA[i] * vectorA[i]
+    normB += vectorB[i] * vectorB[i]
+  }
+
+  if (!normA || !normB) {
+    return 0
+  }
+
+  return dotProduct / (Math.sqrt(normA) * Math.sqrt(normB))
+}
+
+const normalizeContent = (text: string) => text.replace(/\s+/g, " ").trim()
+const MIN_CONTENT_LENGTH = 40
+
+const hasMeaningfulContent = (text: string) => normalizeContent(text).length >= MIN_CONTENT_LENGTH
+
+const extractKeywords = (query: string) => query
+  .toLowerCase()
+  .split(/\W+/)
+  .filter((token) => token.length > 2)
+  .slice(0, 6)
+
+const documentMatchesKeywords = (content: string, keywords: string[]) => {
+  if (!keywords.length) return true
+  const normalized = normalizeContent(content).toLowerCase()
+  return keywords.some((keyword) => normalized.includes(keyword))
+}
+
+const buildSnippet = (content: string, keywords: string[]) => {
+  const normalized = normalizeContent(content)
+  if (!normalized) return ''
+
+  const lower = normalized.toLowerCase()
+  let startIndex = 0
+
+  if (keywords.length) {
+    for (const keyword of keywords) {
+      const matchIndex = lower.indexOf(keyword)
+      if (matchIndex !== -1) {
+        startIndex = Math.max(0, matchIndex - 60)
+        break
+      }
+    }
+  }
+
+  const SNIPPET_LENGTH = 220
+  const snippet = normalized.slice(startIndex, startIndex + SNIPPET_LENGTH)
+  const prefix = startIndex > 0 ? '…' : ''
+  const suffix = startIndex + SNIPPET_LENGTH < normalized.length ? '…' : ''
+
+  return `${prefix}${snippet}${suffix}`.trim()
+}
+
+const dedupeDocumentsByTitle = (docs: DocumentInterface<Record<string, unknown>>[]) => {
+  const seen = new Set<string>()
+  return docs.filter((doc) => {
+    const title = typeof doc.metadata?.title === 'string' ? doc.metadata.title : ''
+    if (!title) return true
+    if (seen.has(title)) return false
+    seen.add(title)
+    return true
+  })
+}
+
 type LangChainContext = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   chain?: Runnable<any, string>
@@ -84,6 +160,8 @@ type Props = {
 const LangChainContextProvider: React.FC<Props> = ({ children }) => {
   const { settings } = useSettingsStore()
   const { data: currentPage } = useGetCurrentPage()
+  const sanitizedOpenRouterModel = settings.openRouterModel?.trim() || OpenRouterModelEnum.OpenAIGPT4oMini
+  const sanitizedOpenRouterEmbeddingModel = settings.openRouterEmbeddingModel?.trim() || OpenRouterModelEnum.GoogleGeminiEmbedding001
 
   const prompt = useMemo(() => {
     return buildPromptTemplate(settings.customSystemPrompt)
@@ -99,55 +177,109 @@ const LangChainContextProvider: React.FC<Props> = ({ children }) => {
     })
   }, [currentPage, settings])
 
-  // const embeddings = useMemo(() => {
-  //   if (settings.embeddingProvider === AIProvider.Gemini && settings.geminiApiKey) {
-  //     return new GoogleGenerativeAIEmbeddings({
-  //       model: GOOGLE_EMBEDDING_MODEL,
-  //       taskType: TaskType.RETRIEVAL_DOCUMENT,
-  //       apiKey: settings.geminiApiKey,
-  //     });
-  //   }
-  //   if (settings.embeddingProvider === AIProvider.Ollama && settings.ollamaEndpoint) {
-  //     return new OllamaEmbeddings({
-  //       model: settings.ollamaEmbeddingModel,
-  //       baseUrl: settings.ollamaEndpoint,
-  //     });
-  //   }
-  //   return null
-  // }, [settings.embeddingProvider, settings.geminiApiKey, settings.ollamaEmbeddingModel, settings.ollamaEndpoint])
+  const embeddings = useMemo(() => {
+    if (settings.embeddingProvider === AIProvider.Gemini && settings.geminiApiKey) {
+      return new GoogleGenerativeAIEmbeddings({
+        apiKey: settings.geminiApiKey,
+        model: GeminiAIModelEnum.TextEmbedding004,
+      })
+    }
+    if (settings.embeddingProvider === AIProvider.Ollama && settings.ollamaEndpoint) {
+      return new OllamaEmbeddings({
+        model: settings.ollamaEmbeddingModel,
+        baseUrl: settings.ollamaEndpoint,
+      })
+    }
+    if (
+      settings.embeddingProvider === AIProvider.OpenRouter &&
+      settings.openRouterAPIKey &&
+      sanitizedOpenRouterEmbeddingModel
+    ) {
+      return new OpenAIEmbeddings({
+        model: sanitizedOpenRouterEmbeddingModel,
+        apiKey: settings.openRouterAPIKey,
+        configuration: {
+          baseURL: 'https://openrouter.ai/api/v1',
+        },
+      })
+    }
+    return null
+  }, [
+    settings.embeddingProvider,
+    settings.geminiApiKey,
+    settings.ollamaEmbeddingModel,
+    settings.ollamaEndpoint,
+    settings.openRouterAPIKey,
+    sanitizedOpenRouterEmbeddingModel,
+  ])
 
   const retrieveRelatedDocuments = useCallback(async (query: string) => {
-    if (logSeqRelatedDocumentRetreiver) {
-      const documents = await logSeqRelatedDocumentRetreiver.invoke(query)      
-
-      // if (embeddings) {
-      //   const cacheBackedEmbeddings = CacheBackedEmbeddings.fromBytesStore(
-      //     embeddings,
-      //     inMemoryStore,
-      //     {
-      //       namespace: embeddings.model,
-      //     }
-      //   );
-
-      //   const vectorstore = await MemoryVectorStore.fromDocuments(
-      //     documents.map(doc => ({ pageContent: doc.pageContent, metadata: doc.metadata})),
-      //     cacheBackedEmbeddings
-      //   );
-      
-      //   const retriever = vectorstore.asRetriever(settings.maxEmbeddedDocuments);
-  
-      //   const retrievedDocuments = await retriever.invoke(query);
-  
-      //   return retrievedDocuments
-      // }
-
-      return documents.map((doc) => ({
-         metadata: doc.metadata,
-         pageContent: doc.pageContent,
-      }))
+    if (!logSeqRelatedDocumentRetreiver) {
+      return null
     }
-    return null;
-  }, [logSeqRelatedDocumentRetreiver])
+
+    const documents = await logSeqRelatedDocumentRetreiver.invoke(query) as DocumentInterface<Record<string, unknown>>[]
+    if (!documents || documents.length === 0) {
+      return []
+    }
+
+    const keywords = extractKeywords(query)
+
+    const candidatePool = dedupeDocumentsByTitle(
+      (() => {
+        const contentRich = documents.filter((doc) => hasMeaningfulContent(doc.pageContent))
+        const keywordMatched = contentRich.filter((doc) => documentMatchesKeywords(doc.pageContent, keywords))
+
+        if (keywordMatched.length) return keywordMatched
+        if (contentRich.length) return contentRich
+        return documents
+      })()
+    )
+
+    if (!candidatePool.length) {
+      return []
+    }
+
+    const formatDocument = (
+      doc: DocumentInterface<Record<string, unknown>>,
+      score?: number,
+    ): DocumentInterface<Record<string, unknown>> => ({
+      metadata: {
+        ...doc.metadata,
+        snippet: buildSnippet(doc.pageContent, keywords),
+        score,
+      },
+      pageContent: doc.pageContent,
+    })
+
+    if (embeddings) {
+      try {
+        const [documentEmbeddings, queryEmbedding] = await Promise.all([
+          embeddings.embedDocuments(candidatePool.map((doc) => doc.pageContent)),
+          embeddings.embedQuery(query),
+        ])
+
+        const scoredDocuments = candidatePool.map((doc, index) => ({
+          doc,
+          score: cosineSimilarity(queryEmbedding, documentEmbeddings[index] || []),
+        }))
+
+        const positiveMatches = scoredDocuments.filter((item) => item.score > 0.05)
+
+        const rankedDocuments = (positiveMatches.length ? positiveMatches : scoredDocuments)
+          .sort((a, b) => b.score - a.score)
+          .slice(0, settings.maxEmbeddedDocuments)
+
+        return rankedDocuments.map((item) => formatDocument(item.doc, item.score))
+      } catch (error) {
+        console.error('Failed to embed LogSeq documents', error)
+      }
+    }
+
+    return candidatePool
+      .slice(0, settings.maxEmbeddedDocuments)
+      .map((doc) => formatDocument(doc))
+  }, [embeddings, logSeqRelatedDocumentRetreiver, settings.maxEmbeddedDocuments])
 
   const geminiModel = useMemo(() => {
     if (settings.geminiApiKey && settings.geminiModel) {
@@ -194,9 +326,9 @@ const LangChainContextProvider: React.FC<Props> = ({ children }) => {
   }, [settings])
 
   const openRouterModel = useMemo(() => {
-    if (settings.openRouterAPIKey && settings.openRouterModel) {
+    if (settings.openRouterAPIKey && sanitizedOpenRouterModel) {
       return new ChatOpenAI({
-        modelName: settings.openRouterModel,
+        modelName: sanitizedOpenRouterModel,
         apiKey: settings.openRouterAPIKey,
         configuration: {
           baseURL: 'https://openrouter.ai/api/v1',
@@ -204,7 +336,7 @@ const LangChainContextProvider: React.FC<Props> = ({ children }) => {
       })
     }
     return undefined
-  }, [settings])
+  }, [sanitizedOpenRouterModel, settings.openRouterAPIKey])
 
   const claudeModel = useMemo(() => {
     if (settings.claudeAPIKey && settings.claudeModel) {

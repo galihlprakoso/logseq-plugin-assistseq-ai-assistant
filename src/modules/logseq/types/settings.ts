@@ -36,7 +36,8 @@ export type LogSeqSettings = {
   maxEmbeddedDocuments: number
   includeURLScrapper: boolean
   openRouterAPIKey: string
-  openRouterModel: OpenRouterModelEnum
+  openRouterModel: string
+  openRouterEmbeddingModel: string
   claudeAPIKey: string
   claudeModel: ClaudeModelEnum
   mistralAPIKey: string

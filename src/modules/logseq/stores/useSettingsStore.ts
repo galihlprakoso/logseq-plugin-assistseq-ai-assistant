@@ -39,6 +39,7 @@ const useSettingsStore = create<SettingState>()(
           includeURLScrapper: false,
           openRouterAPIKey: '',
           openRouterModel: OpenRouterModelEnum.AnthropicClaudeSonnet,
+          openRouterEmbeddingModel: OpenRouterModelEnum.GoogleGeminiEmbedding001,
           claudeAPIKey: '',
           claudeModel: ClaudeModelEnum.Claude35Sonnet20241022,
           mistralAPIKey: '',

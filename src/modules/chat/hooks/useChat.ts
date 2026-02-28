@@ -1,4 +1,4 @@
-import { AIMessage, BaseMessage, HumanMessage, isAIMessage } from "@langchain/core/messages"
+import { AIMessage, BaseMessage, HumanMessage, isAIMessage, SystemMessage } from "@langchain/core/messages"
 import { v4 as uuidv4 } from 'uuid'
 import { useCallback, useMemo, useRef, useState } from "react"
 import useLangChain from "../../langchain/hooks/useLangChain"
@@ -8,7 +8,7 @@ import { ChatMessageRoleEnum, ChatMessage, AgentStep } from "../types/chat"
 import useControlUI from "../../logseq/hooks/control-ui"
 import useSettingsStore from "../../logseq/stores/useSettingsStore"
 import { KROKI_VISUALIZATION_PROMPT } from "../constants/prompts"
-import { getTavilyTool, tavilyTool } from "../../langchain/tools/tavily"
+import { fetchTavilyResults, getTavilyTool, TavilySearchResult, tavilyTool } from "../../langchain/tools/tavily"
 import { tool } from "@langchain/core/tools"
 import { Runnable } from "@langchain/core/runnables"
 import { cheerioTool, getURLContentTool } from "../../langchain/tools/cheerio"
@@ -16,6 +16,7 @@ import { DocumentInterface } from "@langchain/core/documents"
 import { executeAdvancedQuery, advancedQueryTool } from "../../langchain/tools/logseq-advanced-query"
 import useGetCurrentGraph from "../../logseq/services/get-current-graph"
 import { executeReActAgent } from "../../langchain/libs/agent/executor"
+import { LogSeqDocument } from "../../logseq/types/logseq"
 
 interface LogSeqPage {
   name: string
@@ -52,6 +53,136 @@ function formatToolResult(toolName: string, result: any): string {
 const formatDocumentsAsString = (documents: DocumentInterface<Record<string, any>>[]) => {
   const result = documents.map((document) => `Title:${document.metadata.title}\nContent:${document.pageContent}\n`).join("------------------\n")
   return result
+}
+
+const fallbackSnippet = (text: string) => {
+  const normalized = text.replace(/\s+/g, ' ').trim()
+  if (!normalized) return ''
+  return normalized.length > 200 ? `${normalized.slice(0, 200)}…` : normalized
+}
+
+const mapDocumentsToReferences = (documents: DocumentInterface<Record<string, unknown>>[] | null | undefined): LogSeqDocument[] => {
+  if (!documents?.length) {
+    return []
+  }
+
+  const references: LogSeqDocument[] = []
+
+  for (const doc of documents) {
+    const content = (doc.pageContent || '').trim()
+    if (!content) {
+      continue
+    }
+
+    references.push({
+      title: typeof doc.metadata?.title === 'string' ? doc.metadata.title : 'Untitled Page',
+      content: doc.pageContent,
+      snippet: typeof doc.metadata?.snippet === 'string' && doc.metadata.snippet.trim().length
+        ? doc.metadata.snippet
+        : fallbackSnippet(doc.pageContent),
+    })
+  }
+
+  return references
+}
+
+const extractWebSearchQuery = (query: string) => {
+  if (!query) return null
+  const match = query.trim().match(/^web\s+search[:\s]*(.*)$/i)
+  if (!match) return null
+  return match[1]?.trim() || null
+}
+
+const buildSourcesSection = (results: TavilySearchResult[]) => {
+  const capped = results.slice(0, 5)
+  if (!capped.length) {
+    return '### Sources\n- 无可用链接'
+  }
+
+  const lines = capped.map((result, index) => {
+    const title = result.title || `Source ${index + 1}`
+    const url = result.url && result.url.trim().length ? result.url : '#'
+    const score = Number.isFinite(result.score) ? ` (score: ${result.score.toFixed(2)})` : ''
+    return `${index + 1}. [${title}](${url})${score}`
+  }).join('\n')
+
+  return `### Sources\n${lines}`
+}
+
+const buildDefaultSummary = (results: TavilySearchResult[]) => {
+  if (!results.length) {
+    return '### Tavily Search Summary\n未找到匹配的网页结果。'
+  }
+
+  const capped = results.slice(0, 5)
+  const summaryLines = capped.map((result, index) => {
+    const snippet = fallbackSnippet(result.content) || '暂无摘要'
+    const title = result.title || 'Untitled'
+    return `${index + 1}. **${title}** — ${snippet}`
+  }).join('\n')
+
+  return `### Tavily Search Summary\n${summaryLines}`
+}
+
+const formatResultsForPrompt = (results: TavilySearchResult[]) => {
+  return results.slice(0, 5).map((result, index) => {
+    const snippet = fallbackSnippet(result.content) || '暂无摘要'
+    const title = result.title || 'Untitled'
+    const url = result.url || 'N/A'
+    return `Result [${index + 1}]\nTitle: ${title}\nURL: ${url}\nSummary: ${snippet}`
+  }).join('\n\n')
+}
+
+const extractMessageText = (message: unknown): string => {
+  if (!message) return ''
+  if (typeof message === 'string') return message
+  const candidate = message as { content?: unknown }
+  if (typeof candidate.content === 'string') {
+    return candidate.content
+  }
+  if (Array.isArray(candidate.content)) {
+    return candidate.content.map((block) => {
+      if (typeof block === 'string') return block
+      if (block && typeof block === 'object' && 'text' in block) {
+        return (block as { text?: string }).text || ''
+      }
+      return ''
+    }).join('')
+  }
+  if (candidate.content && typeof candidate.content === 'object') {
+    const text = (candidate.content as { text?: string }).text
+    if (text) return text
+  }
+  return ''
+}
+
+const summarizeTavilyResults = async (
+  model: unknown,
+  query: string,
+  results: TavilySearchResult[],
+): Promise<string> => {
+  const defaultSummary = buildDefaultSummary(results)
+  if (!model || !results.length) {
+    return defaultSummary
+  }
+
+  try {
+    const promptContext = formatResultsForPrompt(results)
+    const response = await (model as { invoke: (messages: BaseMessage[] | string) => Promise<unknown> }).invoke([
+      new SystemMessage("You turn raw web search snippets into concise summaries. Always cite evidence using square brackets that reference the numbered results."),
+      new HumanMessage(`User query: ${query}\n\nSearch results:\n${promptContext}\n\nWrite 2-3 bullet points that synthesize the findings. Each bullet must cite at least one source using [n] format referencing the numbered results above.`),
+    ])
+
+    const summaryText = extractMessageText(response).trim()
+    if (!summaryText) {
+      return defaultSummary
+    }
+
+    return summaryText.startsWith('###') ? summaryText : `### Tavily Search Summary\n${summaryText}`
+  } catch (error) {
+    console.error('Failed to summarize Tavily results', error)
+    return defaultSummary
+  }
 }
 
 const useChat = () => {
@@ -98,14 +229,57 @@ const useChat = () => {
   const chat = useCallback(async (query: string) => {
     if (chain && retrieveRelatedDocuments) {
       abortControllerRef.current = new AbortController()
-      setIsGenerating(true)
 
       const page = currentPage as LogSeqPage | null
       const sessionKey: string = page?.name as string || '__global__'  // Global mode when no page
       const pageMessages = messages[sessionKey] || []
 
+      const explicitWebQuery = extractWebSearchQuery(query)
+      if (explicitWebQuery !== null) {
+        addMessage(sessionKey, {
+          id: uuidv4(),
+          content: query,
+          role: ChatMessageRoleEnum.User,
+          relatedDocuments: [],
+        })
+
+        if (!settings.tavilyAPIKey || settings.tavilyAPIKey.trim() === '') {
+          showMessage('请先在设置中填写 Tavily API Key', 'warning')
+          return
+        }
+
+        setIsGenerating(true)
+        try {
+          const normalizedTerm = explicitWebQuery || query
+          const tavilyResults = await fetchTavilyResults(settings.tavilyAPIKey, {
+            query: normalizedTerm,
+            topic: 'general',
+          })
+
+          const summarySection = await summarizeTavilyResults(selectedModel, normalizedTerm, tavilyResults)
+          const sourcesSection = buildSourcesSection(tavilyResults)
+          const responseContent = sourcesSection ? `${summarySection}\n\n${sourcesSection}` : summarySection
+
+          addMessage(sessionKey, {
+            id: uuidv4(),
+            content: responseContent,
+            role: ChatMessageRoleEnum.AI,
+            relatedDocuments: [],
+          })
+        } catch (error) {
+          console.error('Tavily Search failed', error)
+          showMessage('Tavily Search 调用失败，请稍后重试。', 'error')
+        } finally {
+          setIsGenerating(false)
+        }
+        return
+      }
+
+      setIsGenerating(true)
+
       try {
         const documents = await retrieveRelatedDocuments(query)
+        const referenceDocuments = mapDocumentsToReferences(documents)
 
         addMessage(sessionKey, {
           id: uuidv4(),
@@ -219,10 +393,7 @@ const useChat = () => {
                     id: messageId,
                     content,
                     role: ChatMessageRoleEnum.AI,
-                    relatedDocuments: (documents || []).map((doc) => ({
-                      title: doc.metadata.title,
-                      content: doc.pageContent,
-                    })),
+                    relatedDocuments: referenceDocuments,
                   })
                   isFirstYield = false
                   previousContent = content
@@ -348,10 +519,7 @@ const useChat = () => {
                   id: messageId,
                   content: fullContent,
                   role: ChatMessageRoleEnum.AI,
-                  relatedDocuments: (documents || []).map((doc) => ({
-                    title: doc.metadata.title,
-                    content: doc.pageContent,
-                  })),
+                  relatedDocuments: referenceDocuments,
                   agentSteps,  // Keep metadata but don't show in content
                 })
               } else {
@@ -383,10 +551,7 @@ const useChat = () => {
                   id: messageId,
                   content: chunkText,
                   role: ChatMessageRoleEnum.AI,
-                  relatedDocuments: (documents || []).map((doc) => ({
-                    title: doc.metadata.title,
-                    content: doc.pageContent,
-                  })),
+                  relatedDocuments: referenceDocuments,
                 })
               } else {
                 addTextToMessage(sessionKey, messageId, chunkText as string)
@@ -418,10 +583,7 @@ const useChat = () => {
                 id: messageId,
                 content: chunkText,
                 role: ChatMessageRoleEnum.AI,
-                relatedDocuments: (documents || []).map((doc) => ({
-                  title: doc.metadata.title,
-                  content: doc.pageContent,
-                })),
+                relatedDocuments: referenceDocuments,
               })
             } else {
               addTextToMessage(sessionKey, messageId, chunkText as string)
@@ -464,6 +626,8 @@ const useChat = () => {
     settings.geminiModel,
     settings.openAiModel,
     settings.chatGroqModel,
+    settings.tavilyAPIKey,
+    selectedModel,
     showMessage,
     toolsByName
   ])

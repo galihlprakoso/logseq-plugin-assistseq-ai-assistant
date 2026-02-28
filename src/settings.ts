@@ -28,6 +28,7 @@ const settings: SettingSchemaDesc[] = [
     enumChoices: [
       AIProvider.Gemini,
       AIProvider.Ollama,
+      AIProvider.OpenRouter,
     ]
   },
   {
@@ -194,25 +195,19 @@ const settings: SettingSchemaDesc[] = [
   },
   {
     key: 'openRouterModel',
-    type: 'enum',
+    type: 'string',
     title: 'OpenRouter Model',
-    description: 'Select OpenRouter Model',
+    description: 'Enter the exact OpenRouter model slug (e.g. openai/gpt-4o, openai/gpt-5.1-chat).',
     default: OpenRouterModelEnum.OpenAIGPT4oMini,
-    enumChoices: [
-      OpenRouterModelEnum.AnthropicClaudeSonnet,
-      OpenRouterModelEnum.AnthropicClaudeOpus,
-      OpenRouterModelEnum.OpenAIGPT4o,
-      OpenRouterModelEnum.OpenAIGPT4oMini,
-      OpenRouterModelEnum.OpenAIO1,
-      OpenRouterModelEnum.OpenAIO1Preview,
-      OpenRouterModelEnum.OpenAIO1Mini,
-      OpenRouterModelEnum.GoogleGemini2Flash,
-      OpenRouterModelEnum.GoogleGeminiPro,
-      OpenRouterModelEnum.MetaLlama3_370B,
-      OpenRouterModelEnum.MetaLlama3_1405B,
-      OpenRouterModelEnum.MistralLarge,
-      OpenRouterModelEnum.DeepSeekChat,
-    ]
+    inputAs: 'textarea',
+  },
+  {
+    key: 'openRouterEmbeddingModel',
+    type: 'string',
+    title: 'OpenRouter Embedding Model',
+    description: 'Enter the embedding model slug from OpenRouter (e.g. google/gemini-embedding-001).',
+    default: OpenRouterModelEnum.GoogleGeminiEmbedding001,
+    inputAs: 'textarea',
   },
   {
     key: 'claudeSettings',
